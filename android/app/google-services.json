@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "749249311347",
+    "project_id": "bizzy-app-ab5b9",
+    "storage_bucket": "bizzy-app-ab5b9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:749249311347:android:19971b9ce34653ff54b006",
+        "android_client_info": {
+          "package_name": "com.saifo.bizzyupdated"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "749249311347-c5gt80u79kev651u2tg1sof1frvinaju.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCdiHcWNJvLyMb4zUOJ1K-fLkg-BiM7Aoo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "749249311347-c5gt80u79kev651u2tg1sof1frvinaju.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "749249311347-j0r6s1a5eo56mhlb2bltl3158hlg7g96.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.saifo.bizzyupdated"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
