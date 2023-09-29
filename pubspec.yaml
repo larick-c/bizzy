@@ -1,4 +1,4 @@
-name: bizzyupdated
+name: bizzy
 description: Saif Khan Project
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -45,6 +45,8 @@ dependencies:
   firebase_auth: ^4.7.1
   math_expressions: ^2.1.0
   table_calendar: ^3.0.3
+  logger: ^2.0.2+1
+  shared_preferences: ^2.2.1
 
 
 dev_dependencies:
@@ -71,7 +73,8 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/images/
+    - assets/icon/
+    - assets/icons_white/
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg

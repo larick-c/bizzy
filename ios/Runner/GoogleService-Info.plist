@@ -13,7 +13,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.saifo.bizzyupdated</string>
+	<string>com.app.bizzy</string>
 	<key>PROJECT_ID</key>
 	<string>bizzy-app-ab5b9</string>
 	<key>STORAGE_BUCKET</key>

@@ -1,4 +1,4 @@
-package com.saifo.bizzyupdated
+package com.app.bizzy
 
 import io.flutter.embedding.android.FlutterActivity
 

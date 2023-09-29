@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:749249311347:android:19971b9ce34653ff54b006",
         "android_client_info": {
-          "package_name": "com.saifo.bizzyupdated"
+          "package_name": "com.app.bizzy"
         }
       },
       "oauth_client": [
@@ -34,7 +34,7 @@
               "client_id": "749249311347-j0r6s1a5eo56mhlb2bltl3158hlg7g96.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.saifo.bizzyupdated"
+                "bundle_id": "com.app.bizzy"
               }
             }
           ]
