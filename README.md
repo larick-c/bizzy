@@ -1,6 +1,6 @@
-# bizzyupdated
+# bizzy
 
-Saif Khan Project
+A new Flutter project.
 
 ## Getting Started
 

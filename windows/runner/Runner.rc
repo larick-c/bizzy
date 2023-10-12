@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.saifo" "\0"
-            VALUE "FileDescription", "bizzyupdated" "\0"
+            VALUE "CompanyName", "com.example" "\0"
+            VALUE "FileDescription", "bizzy" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "bizzyupdated" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2023 com.saifo. All rights reserved." "\0"
-            VALUE "OriginalFilename", "bizzyupdated.exe" "\0"
-            VALUE "ProductName", "bizzyupdated" "\0"
+            VALUE "InternalName", "bizzy" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2023 com.example. All rights reserved." "\0"
+            VALUE "OriginalFilename", "bizzy.exe" "\0"
+            VALUE "ProductName", "bizzy" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
