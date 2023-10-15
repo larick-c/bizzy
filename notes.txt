@@ -1,0 +1,8 @@
+export PATH="$PATH:`pwd`/flutter/bin"
+flutter doctor
+flutter clean 
+flutter pub get
+cd iOS
+chruby
+chruby ruby-3.2.2
+pod install
