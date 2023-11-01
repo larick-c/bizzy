@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+import 'package:table_calendar/table_calendar.dart';
+
 
 class CalendarFeed extends StatefulWidget {
   const CalendarFeed({super.key});
@@ -18,13 +20,10 @@ class _CalendarFeedState extends State<CalendarFeed> {
     return Container(
         color: Colors.transparent,
         alignment: Alignment.center,
-        child: const Column(
+        child: Column(
           children: <Widget>[
             Expanded(
-              flex: 15,
-              child: Image(
-                image: AssetImage('assets/icon/calendar_fill.png'),
-              ),
+              child: TableCalendar(focusedDay: DateTime.now(), firstDay: DateTime(2023, 1,1), lastDay: DateTime.now())
             ),
           ],
         ));

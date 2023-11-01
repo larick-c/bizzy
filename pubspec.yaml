@@ -38,6 +38,7 @@ dependencies:
   logger: ^2.0.2+1
   shared_preferences: ^2.2.2
   get: ^4.6.5
+  table_calendar: ^3.0.9
 
 dev_dependencies:
   flutter_test:

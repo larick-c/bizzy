@@ -31,7 +31,8 @@ class _NutritionFeedState extends State<NutritionFeed> {
         alignment: Alignment.center,
         child: Column(
           children: <Widget>[
-            Expanded(
+            SizedBox(
+              height: MediaQuery.of(context).size.height / 16,
               child: CustomAppBarState(destinations: const <Widget>[
                 NavigationDestination(
                     icon: ImageIcon(AssetImage('assets/icon/nutrition.png')),
@@ -42,7 +43,6 @@ class _NutritionFeedState extends State<NutritionFeed> {
               ], onDestinationSelected: pageIndexCallback),
             ),
             Expanded(
-              flex: 15,
               child: <Widget>[
                 const NutritionMacroPage(),
                 const NutritionSearchPage()
