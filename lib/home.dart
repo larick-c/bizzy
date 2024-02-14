@@ -1,3 +1,6 @@
+import 'package:bizzy/AppSyncQueries.dart';
+import 'package:bizzy/CreateEventAction.dart';
+import 'package:bizzy/AppState.dart';
 import 'package:bizzy/calendar_feed.dart';
 import 'package:bizzy/cardio_training_page.dart';
 import 'package:bizzy/finance_calendar_page.dart';
@@ -16,26 +19,38 @@ import 'package:bizzy/time_feed.dart';
 import 'package:bizzy/video_feed.dart';
 import 'package:bizzy/weight_training_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/src/response.dart';
 import 'package:logger/logger.dart';
+import 'package:redux/redux.dart';
+import 'Event.dart';
+import 'EventAction.dart';
+import 'EventActionType.dart';
+import 'BGraph.dart';
 
 class Home extends StatelessWidget {
-  const Home({super.key});
-
+  Home({super.key});
+  final Store<AppState> eventStore =
+      Store<AppState>(appReducer, initialState: AppState.initialState());
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: const HomeState(),
-        theme: ThemeData(
-            appBarTheme: const AppBarTheme(
-              color: Colors.white,
-            ),
-            navigationBarTheme: const NavigationBarThemeData(
-                // height: 20,
-                backgroundColor: Colors.white),
-            hoverColor: Colors.transparent,
-            splashColor: Colors.transparent,
-            iconTheme: const IconThemeData()));
+    return StoreProvider(
+      store: eventStore,
+      child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          home: const HomeState(),
+          theme: ThemeData(
+              appBarTheme: const AppBarTheme(
+                color: Colors.white,
+              ),
+              navigationBarTheme: const NavigationBarThemeData(
+                  // height: 20,
+                  backgroundColor: Colors.white),
+              hoverColor: Colors.transparent,
+              splashColor: Colors.transparent,
+              iconTheme: const IconThemeData())),
+    );
   }
 }
 
@@ -160,4 +175,35 @@ class _HomeState extends State<HomeState> {
       ][currentPageIndex],
     );
   }
+}
+
+List<Event> eventReducer(List<Event> eventList, dynamic action) {
+  switch (action.type) {
+    case EventActionType.create:
+      createEvent(action);
+      List<Event> newList = List.from(eventList)..add(action.event);
+      print("newlist size: ${newList.length}");
+      return newList;
+    default:
+      print("EVENT REDUCER DEFAULT");
+  }
+  return eventList;
+}
+
+AppState appReducer(AppState state, dynamic action) {
+  return AppState(
+    events: eventReducer(state.events, action),
+  );
+}
+
+Future<Response> createEvent(dynamic action) async {
+  Map<String, dynamic> eventInput = {
+    "input": {"title": action.event.title}
+  };
+  print("CREATE EVENT ACTION: ${action.event.title}");
+  // final data = await BGraph.performGraphQLQuery(AppSyncQueries.createEvent,
+  //     variables: eventInput);
+  final data = await BGraph.performGraphQLQuery(AppSyncQueries.listEvents);
+  print("DATA: ${data.body}");
+  return data;
 }
