@@ -34,7 +34,8 @@ class _HomePageState extends State<HomePage> {
       child: Column(
         children: 
           <Widget>[ 
-            Expanded(
+            SizedBox(
+              height: MediaQuery.of(context).size.height / 16,
               child: HomePageAppBar(callback: pageIndexCallback)
             ),
             Expanded(

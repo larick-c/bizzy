@@ -21,7 +21,6 @@ class _NutritionMacroPageState extends State<NutritionMacroPage> {
         child: const Column(
           children: <Widget>[
             Expanded(
-              flex: 15,
               child: Image(
                 image: AssetImage('assets/icon/nutrition_fill.png'),
               ),

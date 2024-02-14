@@ -21,7 +21,6 @@ class _NutritionSearchPageState extends State<NutritionSearchPage> {
         child: const Column(
           children: <Widget>[
             Expanded(
-              flex: 15,
               child: Image(
                 image: AssetImage('assets/icon/search_fill.png'),
               ),

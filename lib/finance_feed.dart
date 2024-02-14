@@ -31,7 +31,8 @@ class _FinanceFeedState extends State<FinanceFeed> {
         alignment: Alignment.center,
         child: Column(
           children: <Widget>[
-            Expanded(
+            SizedBox(
+                height: MediaQuery.of(context).size.height / 16,
                 child: CustomAppBarState(destinations: const <Widget>[
               NavigationDestination(
                   icon: ImageIcon(AssetImage('assets/icon/finance.png')),
@@ -41,7 +42,6 @@ class _FinanceFeedState extends State<FinanceFeed> {
                   label: ""),
             ], onDestinationSelected: pageIndexCallback)),
             Expanded(
-              flex: 15,
               child: <Widget>[
                 const FinancePage(),
                 const FinanceCalendarPage()

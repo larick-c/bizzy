@@ -21,7 +21,6 @@ class _FinancePageState extends State<FinancePage> {
         child: const Column(
           children: <Widget>[
             Expanded(
-              flex: 15,
               child: Image(
                 image: AssetImage('assets/icon/finance_fill.png'),
               ),
