@@ -25,7 +25,6 @@ class _CalendarFeedState extends State<CalendarFeed> {
         color: Colors.transparent,
         alignment: Alignment.center,
         child: Column(
-        child: Column(
           children: <Widget>[
             Expanded(
               flex: 15,
