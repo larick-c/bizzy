@@ -185,12 +185,16 @@ AppState appReducer(AppState state, dynamic action) {
 }
 
 Future<Response> createEvent(dynamic action) async {
-  // Map<String, dynamic> eventInput = {
-  //   "input": {"title": action.event.title}
-  // };
-  // print("CREATE EVENT ACTION: ${action.event.title}");
-  // final data = await BGraph.performGraphQLQuery(AppSyncQueries.createEvent,
-  //     variables: eventInput);
+  Map<String, dynamic> eventInput = {
+    "input": {"title": action.event.title}
+  };
+  print("CREATE EVENT ACTION: ${action.event.title}");
+  final data = await BGraph.performGraphQLQuery(AppSyncQueries.createEvent,
+      variables: eventInput);
+  return data;
+}
+
+Future<Response> listEvents(dynamic action) async {
   final data = await BGraph.performGraphQLQuery(AppSyncQueries.listEvents);
   print("DATA: ${data.body}");
   return data;
@@ -199,11 +203,11 @@ Future<Response> createEvent(dynamic action) async {
 // Middleware for making an HTTP request
 void fetchMiddleware(Store<AppState> store, action, NextDispatcher next) {
   if (action is FetchEventsAction) {
-    createEvent(action).then((Response response) {
+    listEvents(action).then((Response response) {
       List<Event> eventList = parseEvents(response.body);
       store.dispatch(FetchEventsSuccessAction(eventList));
     }).catchError((error) {
-      print("FETCH MIDDLEWARE EVENT ACTION ERROR: $error");
+      print("LIST EVENTS MIDDLEWARE ACTION ERROR: $error");
     });
   }
   // Important: Call the next middleware in the chain
