@@ -1,5 +1,5 @@
-import 'package:bizzy/home_page_appBar.dart';
-import 'package:bizzy/photo_feed.dart';
+import 'package:bizzy/home/home_page_appBar.dart';
+import 'package:bizzy/social/photo_feed.dart';
 import 'package:bizzy/text_feed.dart';
 import 'package:bizzy/video_feed.dart';
 import 'package:flutter/material.dart';
@@ -24,30 +24,25 @@ class _HomePageState extends State<HomePage> {
       currentPageIndex = index;
     });
   }
-  
+
   @override
   Widget build(BuildContext context) {
-    return         
-    Container(
-      color: Colors.transparent,
-      alignment: Alignment.center,
-      child: Column(
-        children: 
-          <Widget>[ 
+    return Container(
+        color: Colors.transparent,
+        alignment: Alignment.center,
+        child: Column(
+          children: <Widget>[
             SizedBox(
-              height: MediaQuery.of(context).size.height / 16,
-              child: HomePageAppBar(callback: pageIndexCallback)
-            ),
+                height: MediaQuery.of(context).size.height / 16,
+                child: HomePageAppBar(callback: pageIndexCallback)),
             Expanded(
-              flex: 15, 
-              child: <Widget>[
-                const TextFeed(),
-                const PhotoFeed(),
-                const VideoFeed(),
-              ][currentPageIndex]
-            ),
+                flex: 15,
+                child: <Widget>[
+                  const TextFeed(),
+                  const PhotoFeed(),
+                  const VideoFeed(),
+                ][currentPageIndex]),
           ],
-      )
-    );
+        ));
   }
 }

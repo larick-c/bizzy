@@ -1,6 +1,6 @@
 import 'package:bizzy/custom_app_bar.dart';
-import 'package:bizzy/nutrition_macro_page.dart';
-import 'package:bizzy/nutrition_search_page.dart';
+import 'package:bizzy/nutrition/nutrition_macro_page.dart';
+import 'package:bizzy/nutrition/nutrition_search_page.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 

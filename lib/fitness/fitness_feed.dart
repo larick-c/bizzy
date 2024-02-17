@@ -1,4 +1,4 @@
-import 'package:bizzy/cardio_training_page.dart';
+import 'package:bizzy/fitness/cardio_training_page.dart';
 import 'package:bizzy/custom_app_bar.dart';
 import 'package:bizzy/weight_training_page.dart';
 import 'package:flutter/material.dart';
