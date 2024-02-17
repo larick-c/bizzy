@@ -169,14 +169,13 @@ class _HomeState extends State<HomeState> {
 }
 
 List<Event> eventReducer(List<Event> eventList, dynamic action) {
-  switch (action) {
+  switch (action.runtimeType) {
     case FetchEventsSuccessAction:
-      return [...eventList, ...action.data];
+      return action.events;
     default:
-      print("EVENT REDUCER DEFAULT");
       break;
   }
-  return [...eventList, ...action.data];
+  return eventList;
 }
 
 AppState appReducer(AppState state, dynamic action) {
