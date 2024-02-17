@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:bizzy/AppSyncQueries.dart';
 import 'package:bizzy/AppState.dart';
+import 'package:bizzy/event/FetchEventsAction.dart';
 import 'package:bizzy/calendar_feed.dart';
 import 'package:bizzy/finance_feed.dart';
 import 'package:bizzy/fitness_feed.dart';
@@ -13,14 +16,14 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:http/src/response.dart';
 import 'package:logger/logger.dart';
 import 'package:redux/redux.dart';
-import 'Event.dart';
-import 'EventActionType.dart';
+import 'event/Event.dart';
 import 'BGraph.dart';
+import 'event/FetchEventsSuccessAction.dart';
 
 class Home extends StatelessWidget {
   Home({super.key});
-  final Store<AppState> eventStore =
-      Store<AppState>(appReducer, initialState: AppState.initialState());
+  final Store<AppState> eventStore = Store<AppState>(appReducer,
+      initialState: AppState.initialState(), middleware: [fetchMiddleware]);
   @override
   Widget build(BuildContext context) {
     return StoreProvider(
@@ -166,16 +169,14 @@ class _HomeState extends State<HomeState> {
 }
 
 List<Event> eventReducer(List<Event> eventList, dynamic action) {
-  switch (action.type) {
-    case EventActionType.create:
-      createEvent(action);
-      List<Event> newList = List.from(eventList)..add(action.event);
-      print("newlist size: ${newList.length}");
-      return newList;
+  switch (action) {
+    case FetchEventsSuccessAction:
+      return [...eventList, ...action.data];
     default:
       print("EVENT REDUCER DEFAULT");
+      break;
   }
-  return eventList;
+  return [...eventList, ...action.data];
 }
 
 AppState appReducer(AppState state, dynamic action) {
@@ -185,13 +186,40 @@ AppState appReducer(AppState state, dynamic action) {
 }
 
 Future<Response> createEvent(dynamic action) async {
-  Map<String, dynamic> eventInput = {
-    "input": {"title": action.event.title}
-  };
-  print("CREATE EVENT ACTION: ${action.event.title}");
+  // Map<String, dynamic> eventInput = {
+  //   "input": {"title": action.event.title}
+  // };
+  // print("CREATE EVENT ACTION: ${action.event.title}");
   // final data = await BGraph.performGraphQLQuery(AppSyncQueries.createEvent,
   //     variables: eventInput);
   final data = await BGraph.performGraphQLQuery(AppSyncQueries.listEvents);
   print("DATA: ${data.body}");
   return data;
+}
+
+// Middleware for making an HTTP request
+void fetchMiddleware(Store<AppState> store, action, NextDispatcher next) {
+  if (action is FetchEventsAction) {
+    createEvent(action).then((Response response) {
+      List<Event> eventList = parseEvents(response.body);
+      store.dispatch(FetchEventsSuccessAction(eventList));
+    }).catchError((error) {
+      print("FETCH MIDDLEWARE EVENT ACTION ERROR: $error");
+    });
+  }
+  // Important: Call the next middleware in the chain
+  next(action);
+}
+
+List<Event> parseEvents(String jsonString) {
+  final decoded = json.decode(jsonString);
+  final data = decoded['data'] as Map<String, dynamic>?;
+  if (data == null) {
+    throw Exception('Data is null');
+  }
+  final getEvents = data['getEvents'] as List<dynamic>?;
+  if (getEvents == null) {
+    throw Exception('getEvents is null');
+  }
+  return getEvents.map<Event>((json) => Event.fromJson(json)).toList();
 }

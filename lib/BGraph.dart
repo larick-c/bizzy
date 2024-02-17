@@ -8,7 +8,7 @@ class BGraph {
       {Map<String, dynamic>? variables}) async {
     final headers = {
       'Content-Type': 'application/json',
-      'x-api-key': 'da2-yg53sxrpzvhdlhdchfr5s2gufi'
+      'x-api-key': 'da2-qflxn2mi2vba3lvzsb76lgke4a'
     };
     // final requestBody = json.encode({
     //   'query': query,

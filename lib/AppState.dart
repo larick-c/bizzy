@@ -1,4 +1,4 @@
-import 'Event.dart';
+import 'event/Event.dart';
 
 class AppState {
   final List<Event> events;

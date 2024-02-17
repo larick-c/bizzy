@@ -1,5 +1,4 @@
-import 'package:bizzy/EventActionType.dart';
-
+import 'EventActionType.dart';
 import 'Event.dart';
 
 class EventAction {
