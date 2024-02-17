@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:bizzy/AppSyncQueries.dart';
 import 'package:bizzy/AppState.dart';
+import 'package:bizzy/event/EventAction.dart';
 import 'package:bizzy/event/FetchEventsAction.dart';
 import 'package:bizzy/calendar/calendar_feed.dart';
 import 'package:bizzy/finance/finance_feed.dart';
@@ -188,14 +189,13 @@ Future<Response> createEvent(dynamic action) async {
   Map<String, dynamic> eventInput = {
     "input": {"title": action.event.title}
   };
-  print("CREATE EVENT ACTION: ${action.event.title}");
-  final data = await BGraph.performGraphQLQuery(AppSyncQueries.createEvent,
+  final data = await BGraph.createEvent(AppSyncQueries.createEvent,
       variables: eventInput);
   return data;
 }
 
 Future<Response> listEvents(dynamic action) async {
-  final data = await BGraph.performGraphQLQuery(AppSyncQueries.listEvents);
+  final data = await BGraph.listEvents(AppSyncQueries.listEvents);
   print("DATA: ${data.body}");
   return data;
 }
@@ -208,6 +208,10 @@ void fetchMiddleware(Store<AppState> store, action, NextDispatcher next) {
       store.dispatch(FetchEventsSuccessAction(eventList));
     }).catchError((error) {
       print("LIST EVENTS MIDDLEWARE ACTION ERROR: $error");
+    });
+  } else if (action is EventAction) {
+    createEvent(action).then((Response response) {
+      store.dispatch(FetchEventsAction());
     });
   }
   // Important: Call the next middleware in the chain

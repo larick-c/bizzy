@@ -17,6 +17,15 @@ class _CalendarFeedState extends State<CalendarFeed> {
     printer: PrettyPrinter(),
   );
 
+  final TextEditingController _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    // Dispose of the TextEditingController when the widget is disposed
+    _controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -45,10 +54,33 @@ class _CalendarFeedState extends State<CalendarFeed> {
                           },
                         ),
                       ),
-                      ElevatedButton(
-                        onPressed: () => eventViewModel.fetchEvents(),
-                        child: const Text('Press Me'),
-                      )
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        // mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: 200,
+                            child: TextField(
+                              controller: _controller,
+                              decoration: const InputDecoration(
+                                labelText: 'Enter Event Title',
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          ElevatedButton(
+                            onPressed: () {
+                              String eventTitle = _controller.text;
+                              eventViewModel.createEvent(eventTitle);
+                            },
+                            child: const Text('Create Event'),
+                          ),
+                          ElevatedButton(
+                            onPressed: () => eventViewModel.fetchEvents(),
+                            child: const Text('Fetch Events'),
+                          ),
+                        ],
+                      ),
                     ],
                   );
                 },
