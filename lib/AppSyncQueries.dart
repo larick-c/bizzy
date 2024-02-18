@@ -18,4 +18,13 @@ class AppSyncQueries {
       }
     }
   ''';
+
+  static const String deleteEvent =
+      '''
+      mutation DeleteEvent (\$input: DeleteEventInput!) {
+        deleteEvent(input: \$input) {
+          title
+        }
+      }
+    ''';
 }

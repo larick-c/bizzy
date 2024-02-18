@@ -1,7 +1,7 @@
-import 'Event.dart';
+import 'EventWithId.dart';
 
 class FetchEventsSuccessAction {
-  final List<Event> events; // Define '_events' property
+  final List<EventWithId> events; // Define '_events' property
 
   FetchEventsSuccessAction(this.events);
 }

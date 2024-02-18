@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:bizzy/AppSyncQueries.dart';
 import 'package:bizzy/AppState.dart';
 import 'package:bizzy/event/EventAction.dart';
+import 'package:bizzy/event/EventActionType.dart';
+import 'package:bizzy/event/EventWithId.dart';
 import 'package:bizzy/event/FetchEventsAction.dart';
 import 'package:bizzy/calendar/calendar_feed.dart';
 import 'package:bizzy/finance/finance_feed.dart';
@@ -20,6 +22,8 @@ import 'package:redux/redux.dart';
 import 'package:bizzy/event/Event.dart';
 import 'package:bizzy/BGraph.dart';
 import 'package:bizzy/event/FetchEventsSuccessAction.dart';
+
+import '../event/DeleteEventAction.dart';
 
 class Home extends StatelessWidget {
   Home({super.key});
@@ -169,7 +173,7 @@ class _HomeState extends State<HomeState> {
   }
 }
 
-List<Event> eventReducer(List<Event> eventList, dynamic action) {
+List<EventWithId> eventReducer(List<EventWithId> eventList, dynamic action) {
   switch (action.runtimeType) {
     case FetchEventsSuccessAction:
       return action.events;
@@ -200,25 +204,46 @@ Future<Response> listEvents(dynamic action) async {
   return data;
 }
 
+Future<Response> deleteEvent(dynamic action) async {
+  Map<String, dynamic> deleteEventInput = {
+    "input": {
+      "userId": action.eventWithId.userId,
+      "created_ts": action.eventWithId.created_ts
+    }
+  };
+  final data = await BGraph.createEvent(AppSyncQueries.deleteEvent,
+      variables: deleteEventInput);
+  print("DATA: ${data.body}");
+  return data;
+}
+
 // Middleware for making an HTTP request
 void fetchMiddleware(Store<AppState> store, action, NextDispatcher next) {
   if (action is FetchEventsAction) {
     listEvents(action).then((Response response) {
-      List<Event> eventList = parseEvents(response.body);
+      List<EventWithId> eventList = parseEvents(response.body);
       store.dispatch(FetchEventsSuccessAction(eventList));
     }).catchError((error) {
       print("LIST EVENTS MIDDLEWARE ACTION ERROR: $error");
     });
   } else if (action is EventAction) {
-    createEvent(action).then((Response response) {
-      store.dispatch(FetchEventsAction());
-    });
+    if (action.type == EventActionType.create) {
+      createEvent(action).then((Response response) {
+        store.dispatch(FetchEventsAction());
+      });
+    }
+  } else if (action is DeleteEventAction) {
+    if (action.type == EventActionType.delete) {
+      deleteEvent(action).then((Response response) {
+        store.dispatch(FetchEventsAction());
+      });
+    }
   }
   // Important: Call the next middleware in the chain
   next(action);
 }
 
-List<Event> parseEvents(String jsonString) {
+List<EventWithId> parseEvents(String jsonString) {
   final decoded = json.decode(jsonString);
   final data = decoded['data'] as Map<String, dynamic>?;
   if (data == null) {
@@ -228,5 +253,7 @@ List<Event> parseEvents(String jsonString) {
   if (getEvents == null) {
     throw Exception('getEvents is null');
   }
-  return getEvents.map<Event>((json) => Event.fromJson(json)).toList();
+  return getEvents
+      .map<EventWithId>((json) => EventWithId.fromJson(json))
+      .toList();
 }

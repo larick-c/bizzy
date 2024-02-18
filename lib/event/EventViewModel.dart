@@ -1,3 +1,6 @@
+import 'package:bizzy/event/DeleteEventAction.dart';
+import 'package:bizzy/event/EventWithId.dart';
+
 import 'EventAction.dart';
 import 'FetchEventsAction.dart';
 import 'Event.dart';
@@ -6,13 +9,15 @@ import 'package:bizzy/AppState.dart';
 import 'package:redux/redux.dart';
 
 class EventViewModel {
-  final List<Event> events;
+  final List<EventWithId> events;
   final Function(String) createEvent;
+  final Function(EventWithId) deleteEvent;
   final Function() fetchEvents;
 
   EventViewModel(
       {required this.events,
       required this.createEvent,
+      required this.deleteEvent,
       required this.fetchEvents});
 
   static EventViewModel fromStore(Store<AppState> store) {
@@ -21,6 +26,8 @@ class EventViewModel {
         createEvent: (eventTitle) => store.dispatch(EventAction(
             EventActionType.create,
             event: Event(title: eventTitle))),
+        deleteEvent: (event) =>
+            store.dispatch(DeleteEventAction(EventActionType.delete, event)),
         fetchEvents: () => store.dispatch(FetchEventsAction()));
   }
 }

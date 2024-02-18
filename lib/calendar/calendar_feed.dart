@@ -48,11 +48,11 @@ class _CalendarFeedState extends State<CalendarFeed> {
                         child: ListView.builder(
                           itemCount: eventViewModel.events.length,
                           itemBuilder: (context, index) {
-                            return ListTile(
-                              title: Text(eventViewModel.events[index].title),
-                            );
-                            // return DeleteableListTile(
-                            //     title: eventViewModel.events[index].title);
+                            // return ListTile(
+                            //   title: Text(eventViewModel.events[index].title),
+                            // );
+                            return DismissableWidget(
+                                event: eventViewModel.events[index]);
                           },
                         ),
                       ),
@@ -75,6 +75,7 @@ class _CalendarFeedState extends State<CalendarFeed> {
                               if (_controller.text != "") {
                                 String eventTitle = _controller.text;
                                 eventViewModel.createEvent(eventTitle);
+                                _controller.clear();
                               }
                             },
                             child: const Text('Create Event'),
@@ -95,25 +96,42 @@ class _CalendarFeedState extends State<CalendarFeed> {
   }
 }
 
-class DeleteableListTile extends StatelessWidget {
-  final String title;
-  const DeleteableListTile({Key? key, required this.title}) : super(key: key);
+class DismissableWidget extends StatefulWidget {
+  final dynamic event;
+
+  DismissableWidget({required this.event});
 
   @override
+  _DismissableWidgetState createState() => _DismissableWidgetState();
+}
+
+class _DismissableWidgetState extends State<DismissableWidget> {
+  final GlobalKey<_DismissableWidgetState> dismissableKey = GlobalKey();
+  bool _isDismissed = false;
+  @override
   Widget build(BuildContext context) {
-    return Dismissible(
-      key: const Key('uniqueKey'), // Provide a unique key for each item
-      background: Container(color: Colors.red), // Background color when swiping
-      direction:
-          DismissDirection.endToStart, // Swipe from right to left to delete
-      onDismissed: (direction) {
-        // Handle item dismissal here (e.g., delete item from list)
-        print('Item dismissed');
-      },
-      child: ListTile(
-        title: Text(title),
-        trailing: const Icon(Icons.delete), // Delete icon
-      ),
-    );
+    return StoreConnector<AppState, EventViewModel>(
+        converter: (store) => EventViewModel.fromStore(store),
+        builder: (context, eventViewModel) {
+          return _isDismissed
+              ? SizedBox()
+              : Dismissible(
+                  key: dismissableKey, // Provide a unique key for each item
+                  background: Container(
+                      color: Colors.red), // Background color when swiping
+                  direction: DismissDirection
+                      .endToStart, // Swipe from right to left to delete
+                  onDismissed: (direction) {
+                    setState(() {
+                      _isDismissed = true;
+                    });
+                    eventViewModel.deleteEvent(widget.event);
+                  },
+                  child: ListTile(
+                    title: Text(widget.event.title),
+                    trailing: const Icon(Icons.delete), // Delete icon
+                  ),
+                );
+        });
   }
 }
