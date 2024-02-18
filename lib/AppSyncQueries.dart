@@ -12,8 +12,8 @@ class AppSyncQueries {
       '''
     query GetEvents {
       getEvents {
-        description
-        eventDate
+        userId
+        created_ts
         title
       }
     }

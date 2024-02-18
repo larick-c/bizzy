@@ -51,6 +51,8 @@ class _CalendarFeedState extends State<CalendarFeed> {
                             return ListTile(
                               title: Text(eventViewModel.events[index].title),
                             );
+                            // return DeleteableListTile(
+                            //     title: eventViewModel.events[index].title);
                           },
                         ),
                       ),
@@ -70,8 +72,10 @@ class _CalendarFeedState extends State<CalendarFeed> {
                           const SizedBox(height: 20),
                           ElevatedButton(
                             onPressed: () {
-                              String eventTitle = _controller.text;
-                              eventViewModel.createEvent(eventTitle);
+                              if (_controller.text != "") {
+                                String eventTitle = _controller.text;
+                                eventViewModel.createEvent(eventTitle);
+                              }
                             },
                             child: const Text('Create Event'),
                           ),
@@ -88,5 +92,28 @@ class _CalendarFeedState extends State<CalendarFeed> {
             ),
           ],
         ));
+  }
+}
+
+class DeleteableListTile extends StatelessWidget {
+  final String title;
+  const DeleteableListTile({Key? key, required this.title}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Dismissible(
+      key: const Key('uniqueKey'), // Provide a unique key for each item
+      background: Container(color: Colors.red), // Background color when swiping
+      direction:
+          DismissDirection.endToStart, // Swipe from right to left to delete
+      onDismissed: (direction) {
+        // Handle item dismissal here (e.g., delete item from list)
+        print('Item dismissed');
+      },
+      child: ListTile(
+        title: Text(title),
+        trailing: const Icon(Icons.delete), // Delete icon
+      ),
+    );
   }
 }
