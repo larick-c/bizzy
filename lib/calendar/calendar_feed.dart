@@ -1,3 +1,4 @@
+import 'package:bizzy/calendar/BizzyCalendar.dart';
 import 'package:bizzy/event/EventViewModel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -44,18 +45,21 @@ class _CalendarFeedState extends State<CalendarFeed> {
                 builder: (context, eventViewModel) {
                   return Column(
                     children: [
-                      Expanded(
-                        child: ListView.builder(
-                          itemCount: eventViewModel.events.length,
-                          itemBuilder: (context, index) {
-                            // return ListTile(
-                            //   title: Text(eventViewModel.events[index].title),
-                            // );
-                            return DismissableWidget(
-                                event: eventViewModel.events[index]);
-                          },
-                        ),
+                      const Expanded(
+                        child: BizzyCalendar(),
                       ),
+                      // Expanded(
+                      //   child: ListView.builder(
+                      //     itemCount: eventViewModel.events.length,
+                      //     itemBuilder: (context, index) {
+                      //       // return ListTile(
+                      //       //   title: Text(eventViewModel.events[index].title),
+                      //       // );
+                      //       return DismissableWidget(
+                      //           event: eventViewModel.events[index]);
+                      //     },
+                      //   ),
+                      // ),
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         // mainAxisAlignment: MainAxisAlignment.center,
