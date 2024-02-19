@@ -1,4 +1,5 @@
 import 'package:bizzy/calendar/BizzyCalendar.dart';
+import 'package:bizzy/calendar/TableEvents.dart';
 import 'package:bizzy/event/EventViewModel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -44,61 +45,61 @@ class _CalendarFeedState extends State<CalendarFeed> {
                 builder: (context, eventViewModel) {
                   return Column(
                     children: [
-                      SizedBox(
-                        height: MediaQuery.of(context).size.height * .5,
-                        child: const BizzyCalendar(),
+                      Expanded(
+                        // height: MediaQuery.of(context).size.height * .6,
+                        child: TableEventsExample(),
                       ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      SingleChildScrollView(
-                        child: SizedBox(
-                          height: MediaQuery.of(context).size.height * .1,
-                          child: ListView.builder(
-                            itemCount: eventViewModel.events.length,
-                            itemBuilder: (context, index) {
-                              // return ListTile(
-                              //   title: Text(eventViewModel.events[index].title),
-                              // );
-                              return DismissableWidget(
-                                  event: eventViewModel.events[index]);
-                            },
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        height: MediaQuery.of(context).size.height * .1,
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          // mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SizedBox(
-                              width: 200,
-                              child: TextField(
-                                controller: _controller,
-                                decoration: const InputDecoration(
-                                  labelText: 'Enter Event Title',
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-                            ElevatedButton(
-                              onPressed: () {
-                                if (_controller.text != "") {
-                                  String eventTitle = _controller.text;
-                                  eventViewModel.createEvent(eventTitle);
-                                  _controller.clear();
-                                }
-                              },
-                              child: const Text('Create Event'),
-                            ),
-                            ElevatedButton(
-                              onPressed: () => eventViewModel.fetchEvents(),
-                              child: const Text('Fetch Events'),
-                            ),
-                          ],
-                        ),
-                      ),
+                      // const SizedBox(
+                      //   height: 10,
+                      // ),
+                      // SingleChildScrollView(
+                      //   child: SizedBox(
+                      //     height: MediaQuery.of(context).size.height * .1,
+                      //     child: ListView.builder(
+                      //       itemCount: eventViewModel.events.length,
+                      //       itemBuilder: (context, index) {
+                      //         // return ListTile(
+                      //         //   title: Text(eventViewModel.events[index].title),
+                      //         // );
+                      //         return DismissableWidget(
+                      //             event: eventViewModel.events[index]);
+                      //       },
+                      //     ),
+                      //   ),
+                      // ),
+                      // SizedBox(
+                      //   height: MediaQuery.of(context).size.height * .1,
+                      //   child: Row(
+                      //     mainAxisSize: MainAxisSize.min,
+                      //     // mainAxisAlignment: MainAxisAlignment.center,
+                      //     children: [
+                      //       SizedBox(
+                      //         width: 200,
+                      //         child: TextField(
+                      //           controller: _controller,
+                      //           decoration: const InputDecoration(
+                      //             labelText: 'Enter Event Title',
+                      //           ),
+                      //         ),
+                      //       ),
+                      //       const SizedBox(height: 20),
+                      //       ElevatedButton(
+                      //         onPressed: () {
+                      //           if (_controller.text != "") {
+                      //             String eventTitle = _controller.text;
+                      //             eventViewModel.createEvent(eventTitle);
+                      //             _controller.clear();
+                      //           }
+                      //         },
+                      //         child: const Text('Create Event'),
+                      //       ),
+                      //       ElevatedButton(
+                      //         onPressed: () => eventViewModel.fetchEvents(),
+                      //         child: const Text('Fetch Events'),
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ),
                     ],
                   );
                 },
