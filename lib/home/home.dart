@@ -19,7 +19,6 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:http/src/response.dart';
 import 'package:logger/logger.dart';
 import 'package:redux/redux.dart';
-import 'package:bizzy/event/Event.dart';
 import 'package:bizzy/BGraph.dart';
 import 'package:bizzy/event/FetchEventsSuccessAction.dart';
 
@@ -191,7 +190,10 @@ AppState appReducer(AppState state, dynamic action) {
 
 Future<Response> createEvent(dynamic action) async {
   Map<String, dynamic> eventInput = {
-    "input": {"title": action.event.title}
+    "input": {
+      "title": action.event.title,
+      "eventDate": action.event.eventDate.toString()
+    }
   };
   final data = await BGraph.createEvent(AppSyncQueries.createEvent,
       variables: eventInput);
@@ -229,7 +231,8 @@ void fetchMiddleware(Store<AppState> store, action, NextDispatcher next) {
   } else if (action is EventAction) {
     if (action.type == EventActionType.create) {
       createEvent(action).then((Response response) {
-        store.dispatch(FetchEventsAction());
+        // store.dispatch(FetchEventsAction());
+        print('Created event successfully');
       });
     }
   } else if (action is DeleteEventAction) {

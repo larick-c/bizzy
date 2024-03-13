@@ -10,7 +10,7 @@ import 'package:redux/redux.dart';
 
 class EventViewModel {
   final List<EventWithId> events;
-  final Function(String) createEvent;
+  final Function(Event) createEvent;
   final Function(EventWithId) deleteEvent;
   final Function() fetchEvents;
 
@@ -23,9 +23,8 @@ class EventViewModel {
   static EventViewModel fromStore(Store<AppState> store) {
     return EventViewModel(
         events: store.state.events,
-        createEvent: (eventTitle) => store.dispatch(EventAction(
-            EventActionType.create,
-            event: Event(title: eventTitle))),
+        createEvent: (event) =>
+            store.dispatch(EventAction(EventActionType.create, event: event)),
         deleteEvent: (event) =>
             store.dispatch(DeleteEventAction(EventActionType.delete, event)),
         fetchEvents: () => store.dispatch(FetchEventsAction()));

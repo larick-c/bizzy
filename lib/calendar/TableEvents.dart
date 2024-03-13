@@ -1,7 +1,10 @@
 // Copyright 2019 Aleksander Woźniak
 // SPDX-License-Identifier: Apache-2.0
 
+import 'package:bizzy/AppState.dart';
+import 'package:bizzy/event/EventViewModel.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import '../event/Event.dart';
@@ -21,6 +24,8 @@ class _TableEventsExampleState extends State<TableEventsExample> {
   DateTime? _selectedDay;
   DateTime? _rangeStart;
   DateTime? _rangeEnd;
+
+  final TextEditingController _controller = TextEditingController();
 
   @override
   void initState() {
@@ -51,6 +56,7 @@ class _TableEventsExampleState extends State<TableEventsExample> {
   }
 
   void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {
+    print('Selected day $selectedDay');
     if (!isSameDay(_selectedDay, selectedDay)) {
       setState(() {
         _selectedDay = selectedDay;
@@ -99,7 +105,7 @@ class _TableEventsExampleState extends State<TableEventsExample> {
             rangeSelectionMode: _rangeSelectionMode,
             eventLoader: _getEventsForDay,
             startingDayOfWeek: StartingDayOfWeek.monday,
-            calendarStyle: CalendarStyle(
+            calendarStyle: const CalendarStyle(
               // Use `CalendarStyle` to customize the UI
               outsideDaysVisible: false,
             ),
@@ -116,35 +122,119 @@ class _TableEventsExampleState extends State<TableEventsExample> {
               _focusedDay = focusedDay;
             },
           ),
-          const SizedBox(height: 8.0),
-          Expanded(
-            child: ValueListenableBuilder<List<Event>>(
-              valueListenable: _selectedEvents,
-              builder: (context, value, _) {
-                return ListView.builder(
-                  itemCount: value.length,
-                  itemBuilder: (context, index) {
-                    return Container(
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 12.0,
-                        vertical: 4.0,
+          // const SizedBox(height: 8.0),
+          // Expanded(
+          //   child: ValueListenableBuilder<List<Event>>(
+          //     valueListenable: _selectedEvents,
+          //     builder: (context, value, _) {
+          //       return ListView.builder(
+          //         itemCount: value.length,
+          //         itemBuilder: (context, index) {
+          //           return Container(
+          //             margin: const EdgeInsets.symmetric(
+          //               horizontal: 12.0,
+          //               vertical: 4.0,
+          //             ),
+          //             decoration: BoxDecoration(
+          //               border: Border.all(),
+          //               borderRadius: BorderRadius.circular(12.0),
+          //             ),
+          //             child: ListTile(
+          //               onTap: () => print(value[index].title),
+          //               title: Text(value[index].title),
+          //             ),
+          //           );
+          //         },
+          //       );
+          //     },
+          //   ),
+          // ),
+
+          // Image(
+          //   image: AssetImage('assets/icon/calendar_fill.png'),
+          // ),
+          StoreConnector<AppState, EventViewModel>(
+            converter: (store) => EventViewModel.fromStore(store),
+            builder: (context, eventViewModel) {
+              return Row(
+                mainAxisSize: MainAxisSize.min,
+                // mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _controller,
+                      decoration: const InputDecoration(
+                        labelText: 'Enter Event Title',
                       ),
-                      decoration: BoxDecoration(
-                        border: Border.all(),
-                        borderRadius: BorderRadius.circular(12.0),
-                      ),
-                      child: ListTile(
-                        onTap: () => print(value[index].title),
-                        title: Text(value[index].title),
-                      ),
-                    );
-                  },
-                );
-              },
-            ),
+                    ),
+                  ),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (_controller.text != "") {
+                          Event event = Event(
+                              title: _controller.text,
+                              eventDate: DateTime.now());
+                          eventViewModel.createEvent(event);
+                          _controller.clear();
+                          kEvents[DateTime.now()]?.add(event);
+                        }
+                      },
+                      child: const Text('Create Event'),
+                    ),
+                  ),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => eventViewModel.fetchEvents(),
+                      child: const Text('Fetch Events'),
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
         ],
       ),
     );
+  }
+}
+
+class DismissableWidget extends StatefulWidget {
+  final dynamic event;
+
+  DismissableWidget({required this.event});
+
+  @override
+  _DismissableWidgetState createState() => _DismissableWidgetState();
+}
+
+class _DismissableWidgetState extends State<DismissableWidget> {
+  final GlobalKey<_DismissableWidgetState> dismissableKey = GlobalKey();
+  bool _isDismissed = false;
+  @override
+  Widget build(BuildContext context) {
+    return StoreConnector<AppState, EventViewModel>(
+        converter: (store) => EventViewModel.fromStore(store),
+        builder: (context, eventViewModel) {
+          return _isDismissed
+              ? SizedBox()
+              : Dismissible(
+                  key: dismissableKey, // Provide a unique key for each item
+                  background: Container(
+                      color: Colors.red), // Background color when swiping
+                  direction: DismissDirection
+                      .endToStart, // Swipe from right to left to delete
+                  onDismissed: (direction) {
+                    setState(() {
+                      _isDismissed = true;
+                    });
+                    eventViewModel.deleteEvent(widget.event);
+                  },
+                  child: ListTile(
+                    title: Text(widget.event.title),
+                    trailing: const Icon(Icons.delete), // Delete icon
+                  ),
+                );
+        });
   }
 }
