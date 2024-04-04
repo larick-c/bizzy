@@ -230,10 +230,10 @@ void fetchMiddleware(Store<AppState> store, action, NextDispatcher next) {
     });
   } else if (action is EventAction) {
     if (action.type == EventActionType.create) {
-      createEvent(action).then((Response response) {
-        // store.dispatch(FetchEventsAction());
-        print('Created event successfully');
-      });
+      print('Created event successfully');
+      // createEvent(action).then((Response response) {
+      // store.dispatch(FetchEventsAction());
+      // });
     }
   } else if (action is DeleteEventAction) {
     if (action.type == EventActionType.delete) {

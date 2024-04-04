@@ -177,7 +177,17 @@ class _TableEventsExampleState extends State<TableEventsExample> {
                               eventDate: DateTime.now());
                           eventViewModel.createEvent(event);
                           _controller.clear();
-                          kEvents[DateTime.now()]?.add(event);
+                          DateTime normalizedDate = DateTime(
+                              DateTime.now().year,
+                              DateTime.now().month,
+                              DateTime.now().day);
+                          if (!kEvents.containsKey(normalizedDate)) {
+                            kEvents[normalizedDate] = [event];
+                          } else {
+                            kEvents[normalizedDate]?.add(event);
+                          }
+                          print(
+                              'kEvents size: ${kEvents[DateTime.now()]?.length}');
                         }
                       },
                       child: const Text('Create Event'),
@@ -185,7 +195,7 @@ class _TableEventsExampleState extends State<TableEventsExample> {
                   ),
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () => eventViewModel.fetchEvents(),
+                      onPressed: () => {},
                       child: const Text('Fetch Events'),
                     ),
                   ),
