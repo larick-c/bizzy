@@ -121,38 +121,107 @@ class _TableEventsExampleState extends State<TableEventsExample> {
             onPageChanged: (focusedDay) {
               _focusedDay = focusedDay;
             },
+            calendarBuilders: CalendarBuilders(
+              markerBuilder: (context, date, events) {
+                if (events.isNotEmpty) {
+                  return Positioned(
+                    right: 1,
+                    bottom: 1,
+                    child: Container(
+                      padding: EdgeInsets.all(4.0),
+                      decoration: BoxDecoration(
+                        color: Colors.black, // Customize this color
+                        shape: BoxShape.rectangle,
+                        borderRadius: BorderRadius.circular(
+                            8.0), // Adjust for rounded corners
+                      ),
+                      child: Text(
+                        '${events.length}',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12.0, // Customize text size
+                        ),
+                      ),
+                    ),
+                  );
+                }
+                return null;
+              },
+              selectedBuilder: (context, date, events) {
+                return Container(
+                  margin: const EdgeInsets.all(4.0),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    image: const DecorationImage(
+                      image: AssetImage('assets/icon/1-02.png'),
+                      fit: BoxFit.cover,
+                    ),
+                    shape: BoxShape.rectangle,
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  child: Text(
+                    '${date.day}',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                );
+              },
+              todayBuilder: (context, date, events) {
+                return Container(
+                  margin: const EdgeInsets.all(4.0),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage('assets/icon/1-02.png'),
+                      fit: BoxFit.cover,
+                      colorFilter: ColorFilter.mode(
+                        Colors.black.withOpacity(
+                            0.5), // Adjust opacity here (0.0 - 1.0).
+                        BlendMode
+                            .dstATop, // This blend mode applies the color as an overlay to the image.
+                      ),
+                    ),
+                    // color: Colors.orange, // Custom color for the focused day
+                    shape: BoxShape
+                        .rectangle, // Change to BoxShape.circle for circle
+                    borderRadius: BorderRadius.circular(
+                        8.0), // Adjust for rounded corners
+                  ),
+                  child: Text(
+                    date.day.toString(),
+                    style: TextStyle(color: Colors.white), // Custom text style
+                  ),
+                );
+              },
+            ),
           ),
           // const SizedBox(height: 8.0),
-          // Expanded(
-          //   child: ValueListenableBuilder<List<Event>>(
-          //     valueListenable: _selectedEvents,
-          //     builder: (context, value, _) {
-          //       return ListView.builder(
-          //         itemCount: value.length,
-          //         itemBuilder: (context, index) {
-          //           return Container(
-          //             margin: const EdgeInsets.symmetric(
-          //               horizontal: 12.0,
-          //               vertical: 4.0,
-          //             ),
-          //             decoration: BoxDecoration(
-          //               border: Border.all(),
-          //               borderRadius: BorderRadius.circular(12.0),
-          //             ),
-          //             child: ListTile(
-          //               onTap: () => print(value[index].title),
-          //               title: Text(value[index].title),
-          //             ),
-          //           );
-          //         },
-          //       );
-          //     },
-          //   ),
-          // ),
+          Expanded(
+            child: ValueListenableBuilder<List<Event>>(
+              valueListenable: _selectedEvents,
+              builder: (context, value, _) {
+                return ListView.builder(
+                  itemCount: value.length,
+                  itemBuilder: (context, index) {
+                    return Container(
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: 12.0,
+                        vertical: 4.0,
+                      ),
+                      decoration: BoxDecoration(
+                        border: Border.all(),
+                        borderRadius: BorderRadius.circular(12.0),
+                      ),
+                      child: ListTile(
+                        onTap: () => print(value[index].title),
+                        title: Text(value[index].title),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
 
-          // Image(
-          //   image: AssetImage('assets/icon/calendar_fill.png'),
-          // ),
           StoreConnector<AppState, EventViewModel>(
             converter: (store) => EventViewModel.fromStore(store),
             builder: (context, eventViewModel) {
@@ -177,28 +246,25 @@ class _TableEventsExampleState extends State<TableEventsExample> {
                               eventDate: DateTime.now());
                           eventViewModel.createEvent(event);
                           _controller.clear();
-                          DateTime normalizedDate = DateTime(
-                              DateTime.now().year,
-                              DateTime.now().month,
-                              DateTime.now().day);
+                          DateTime normalizedDate = DateTime(_selectedDay!.year,
+                              _selectedDay!.month, _selectedDay!.day);
                           if (!kEvents.containsKey(normalizedDate)) {
                             kEvents[normalizedDate] = [event];
                           } else {
                             kEvents[normalizedDate]?.add(event);
                           }
-                          print(
-                              'kEvents size: ${kEvents[DateTime.now()]?.length}');
                         }
+                        _selectedEvents.value = _getEventsForDay(_selectedDay!);
                       },
                       child: const Text('Create Event'),
                     ),
                   ),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () => {},
-                      child: const Text('Fetch Events'),
-                    ),
-                  ),
+                  // Expanded(
+                  //   child: ElevatedButton(
+                  //     onPressed: () => {},
+                  //     child: const Text('Fetch Events'),
+                  //   ),
+                  // ),
                 ],
               );
             },
