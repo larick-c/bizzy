@@ -32,6 +32,8 @@ dependencies:
     sdk: flutter
   redux: ^5.0.0
   flutter_redux: ^0.8.2
+  amplify_flutter: ^1.0.0
+  amplify_auth_cognito: ^1.0.0
 
 
   # The following adds the Cupertino Icons font to your application.
