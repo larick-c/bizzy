@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:bizzy/AppSyncQueries.dart';
 import 'package:bizzy/AppState.dart';
 import 'package:bizzy/event/EventAction.dart';
@@ -10,6 +12,7 @@ import 'package:bizzy/calendar/calendar_feed.dart';
 import 'package:bizzy/finance/finance_feed.dart';
 import 'package:bizzy/fitness/fitness_feed.dart';
 import 'package:bizzy/home/home_page.dart';
+import 'package:bizzy/main.dart';
 import 'package:bizzy/nutrition/nutrition_feed.dart';
 import 'package:bizzy/profile/profile_feed.dart';
 import 'package:bizzy/social/search_feed.dart';
@@ -118,12 +121,20 @@ class _HomeState extends State<HomeState> {
       ),
       bottomNavigationBar: NavigationBar(
         onDestinationSelected: (int index) {
-          setState(() {
-            currentPageIndex = index;
-            if (index < 5) {
-              _selectedIndex = index;
-            }
-          });
+          if (index == 5) {
+            signOutCurrentUser().then((value) =>
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
+                  builder: (context) =>
+                      const Bizzy(), // Replace with your desired screen
+                )));
+          } else {
+            setState(() {
+              currentPageIndex = index;
+              if (index < 5) {
+                _selectedIndex = index;
+              }
+            });
+          }
         },
         selectedIndex: _selectedIndex,
         indicatorColor: Colors.transparent,
@@ -154,6 +165,10 @@ class _HomeState extends State<HomeState> {
           NavigationDestination(
             selectedIcon: ImageIcon(AssetImage('assets/icon/finance_fill.png')),
             icon: ImageIcon(AssetImage('assets/icon/finance.png')),
+            label: '',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.exit_to_app),
             label: '',
           ),
         ],
@@ -259,4 +274,13 @@ List<EventWithId> parseEvents(String jsonString) {
   return getEvents
       .map<EventWithId>((json) => EventWithId.fromJson(json))
       .toList();
+}
+
+Future<void> signOutCurrentUser() async {
+  final result = await Amplify.Auth.signOut();
+  if (result is CognitoCompleteSignOut) {
+    safePrint('Sign out completed successfully');
+  } else if (result is CognitoFailedSignOut) {
+    safePrint('Error signing user out: ${result.exception.message}');
+  }
 }
