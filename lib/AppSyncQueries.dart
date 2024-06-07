@@ -5,6 +5,7 @@ class AppSyncQueries {
         userId
         title
         date
+        eventId
       }
     }
   ''';

@@ -18,7 +18,7 @@ class Event {
     return Event(
         userId: map['userId'] as String,
         title: map['title'] as String,
-        // eventId: map['eventId'] as String,
+        eventId: map['eventId'] as String,
         date: DateTime.parse(map['date']));
   }
 }
