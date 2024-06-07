@@ -1,6 +1,7 @@
 // Copyright 2019 Aleksander Woźniak
 // SPDX-License-Identifier: Apache-2.0
 
+import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:bizzy/AppState.dart';
 import 'package:bizzy/event/EventViewModel.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +31,6 @@ class _TableEventsExampleState extends State<TableEventsExample> {
   @override
   void initState() {
     super.initState();
-
     _selectedDay = _focusedDay;
     _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay!));
   }
@@ -196,26 +196,14 @@ class _TableEventsExampleState extends State<TableEventsExample> {
           ),
           // const SizedBox(height: 8.0),
           Expanded(
-            child: ValueListenableBuilder<List<Event>>(
-              valueListenable: _selectedEvents,
-              builder: (context, value, _) {
+            child: StoreConnector<AppState, EventViewModel>(
+              converter: (store) => EventViewModel.fromStore(store),
+              builder: (context, eventViewModel) {
                 return ListView.builder(
-                  itemCount: value.length,
+                  itemCount: eventViewModel.events.length,
                   itemBuilder: (context, index) {
-                    return Container(
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 12.0,
-                        vertical: 4.0,
-                      ),
-                      decoration: BoxDecoration(
-                        border: Border.all(),
-                        borderRadius: BorderRadius.circular(12.0),
-                      ),
-                      child: ListTile(
-                        onTap: () => print(value[index].title),
-                        title: Text(value[index].title),
-                      ),
-                    );
+                    return DismissableWidget(
+                        event: eventViewModel.events[index]);
                   },
                 );
               },
@@ -239,11 +227,13 @@ class _TableEventsExampleState extends State<TableEventsExample> {
                   ),
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
                         if (_controller.text != "") {
+                          AuthUser user = await Amplify.Auth.getCurrentUser();
                           Event event = Event(
+                              userId: user.userId,
                               title: _controller.text,
-                              eventDate: DateTime.now());
+                              date: DateTime.now());
                           eventViewModel.createEvent(event);
                           _controller.clear();
                           DateTime normalizedDate = DateTime(_selectedDay!.year,
@@ -253,8 +243,8 @@ class _TableEventsExampleState extends State<TableEventsExample> {
                           } else {
                             kEvents[normalizedDate]?.add(event);
                           }
+                          print("Date: $normalizedDate");
                         }
-                        _selectedEvents.value = _getEventsForDay(_selectedDay!);
                       },
                       child: const Text('Create Event'),
                     ),
@@ -312,5 +302,14 @@ class _DismissableWidgetState extends State<DismissableWidget> {
                   ),
                 );
         });
+  }
+}
+
+Future<AuthUser?> getCurrentUser() async {
+  try {
+    return await Amplify.Auth.getCurrentUser();
+  } catch (e) {
+    print('Error getting current user: $e');
+    return null;
   }
 }

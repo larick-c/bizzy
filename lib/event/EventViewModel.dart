@@ -1,6 +1,4 @@
 import 'package:bizzy/event/DeleteEventAction.dart';
-import 'package:bizzy/event/EventWithId.dart';
-
 import 'EventAction.dart';
 import 'FetchEventsAction.dart';
 import 'Event.dart';
@@ -9,9 +7,9 @@ import 'package:bizzy/AppState.dart';
 import 'package:redux/redux.dart';
 
 class EventViewModel {
-  final List<EventWithId> events;
+  final List<Event> events;
   final Function(Event) createEvent;
-  final Function(EventWithId) deleteEvent;
+  final Function(Event) deleteEvent;
   final Function() fetchEvents;
 
   EventViewModel(

@@ -1,7 +1,7 @@
-import 'package:bizzy/event/EventWithId.dart';
+import 'package:bizzy/event/Event.dart';
 
 class AppState {
-  final List<EventWithId> events;
+  final List<Event> events;
 
   AppState({required this.events});
 
@@ -9,7 +9,7 @@ class AppState {
     return AppState(events: []);
   }
 
-  AppState copyWith({List<EventWithId>? events}) {
+  AppState copyWith({List<Event>? events}) {
     return AppState(events: events ?? this.events);
   }
 

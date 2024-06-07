@@ -2,9 +2,9 @@ import 'package:http/http.dart' as http;
 import 'dart:convert'; // For json encoding/decoding
 
 class BGraph {
-  static const apiKey = 'da2-66gtz3kyc5cdlnzhq7o7oai6nq';
+  static const apiKey = 'da2-c6vfaznehzhyzkcpi2koz6zrsu';
   static const String url =
-      'https://5cw5bnrrtjbshl3clvtn3brjt4.appsync-api.us-east-2.amazonaws.com/graphql';
+      'https://3wf2higdwbcjdksgw4a7434jda.appsync-api.us-east-2.amazonaws.com/graphql';
   static Future<http.Response> listEvents(String query,
       {Map<String, dynamic>? variables}) async {
     final headers = {'Content-Type': 'application/json', 'x-api-key': apiKey};
@@ -21,7 +21,7 @@ class BGraph {
     return Future(() => http.Response("REQUEST FAILED", 500));
   }
 
-  static Future<http.Response> createEvent(String query,
+  static Future<http.Response> query(String query,
       {Map<String, dynamic>? variables}) async {
     final headers = {'Content-Type': 'application/json', 'x-api-key': apiKey};
     final requestBody = json.encode({
@@ -35,8 +35,7 @@ class BGraph {
         body: requestBody,
       );
     } catch (e) {
-      print('An error occurred: $e');
+      throw Exception('Error creating event: $e');
     }
-    return Future(() => http.Response("REQUEST FAILED", 500));
   }
 }

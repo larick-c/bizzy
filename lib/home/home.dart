@@ -4,9 +4,10 @@ import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:bizzy/AppSyncQueries.dart';
 import 'package:bizzy/AppState.dart';
+import 'package:bizzy/event/CreateEventSuccessAction.dart';
 import 'package:bizzy/event/EventAction.dart';
 import 'package:bizzy/event/EventActionType.dart';
-import 'package:bizzy/event/EventWithId.dart';
+import 'package:bizzy/event/Event.dart';
 import 'package:bizzy/event/FetchEventsAction.dart';
 import 'package:bizzy/calendar/calendar_feed.dart';
 import 'package:bizzy/finance/finance_feed.dart';
@@ -187,10 +188,12 @@ class _HomeState extends State<HomeState> {
   }
 }
 
-List<EventWithId> eventReducer(List<EventWithId> eventList, dynamic action) {
+List<Event> eventReducer(List<Event> eventList, dynamic action) {
   switch (action.runtimeType) {
     case FetchEventsSuccessAction:
       return action.events;
+    case CreateEventSuccessAction:
+      return [...eventList, action.event];
     default:
       break;
   }
@@ -206,12 +209,13 @@ AppState appReducer(AppState state, dynamic action) {
 Future<Response> createEvent(dynamic action) async {
   Map<String, dynamic> eventInput = {
     "input": {
+      "userId": action.event.userId,
       "title": action.event.title,
-      "eventDate": action.event.eventDate.toString()
+      "date": action.event.date.toString()
     }
   };
-  final data = await BGraph.createEvent(AppSyncQueries.createEvent,
-      variables: eventInput);
+  final data =
+      await BGraph.query(AppSyncQueries.createEvent, variables: eventInput);
   return data;
 }
 
@@ -224,11 +228,12 @@ Future<Response> listEvents(dynamic action) async {
 Future<Response> deleteEvent(dynamic action) async {
   Map<String, dynamic> deleteEventInput = {
     "input": {
-      "userId": action.eventWithId.userId,
-      "created_ts": action.eventWithId.created_ts
+      "userId": action.event.userId,
+      "eventId": action.event.eventId,
+      "date": action.event.date.toString()
     }
   };
-  final data = await BGraph.createEvent(AppSyncQueries.deleteEvent,
+  final data = await BGraph.query(AppSyncQueries.deleteEvent,
       variables: deleteEventInput);
   print("DATA: ${data.body}");
   return data;
@@ -238,22 +243,33 @@ Future<Response> deleteEvent(dynamic action) async {
 void fetchMiddleware(Store<AppState> store, action, NextDispatcher next) {
   if (action is FetchEventsAction) {
     listEvents(action).then((Response response) {
-      List<EventWithId> eventList = parseEvents(response.body);
+      List<Event> eventList = parseEvents(response.body);
       store.dispatch(FetchEventsSuccessAction(eventList));
     }).catchError((error) {
       print("LIST EVENTS MIDDLEWARE ACTION ERROR: $error");
     });
   } else if (action is EventAction) {
     if (action.type == EventActionType.create) {
-      print('Created event successfully');
-      // createEvent(action).then((Response response) {
-      // store.dispatch(FetchEventsAction());
-      // });
+      createEvent(action).then((Response response) {
+        Map<String, dynamic> responseHandler = handleGraphQLResponse(response);
+        if (responseHandler['errors'] != null &&
+            responseHandler['errors'].length > 0) {
+          print('ResponseHandler is not empty');
+        } else {
+          print('Created event successfully');
+          Event event = Event.fromMap(responseHandler['createEvent']);
+          store.dispatch(CreateEventSuccessAction(event));
+        }
+      }).catchError((error) {
+        print('Error creating event: $error');
+      });
     }
   } else if (action is DeleteEventAction) {
     if (action.type == EventActionType.delete) {
       deleteEvent(action).then((Response response) {
-        store.dispatch(FetchEventsAction());
+        print('Deleted event successfully');
+      }).catchError((error) {
+        print('Error deleting event: $error');
       });
     }
   }
@@ -261,7 +277,7 @@ void fetchMiddleware(Store<AppState> store, action, NextDispatcher next) {
   next(action);
 }
 
-List<EventWithId> parseEvents(String jsonString) {
+List<Event> parseEvents(String jsonString) {
   final decoded = json.decode(jsonString);
   final data = decoded['data'] as Map<String, dynamic>?;
   if (data == null) {
@@ -271,9 +287,7 @@ List<EventWithId> parseEvents(String jsonString) {
   if (getEvents == null) {
     throw Exception('getEvents is null');
   }
-  return getEvents
-      .map<EventWithId>((json) => EventWithId.fromJson(json))
-      .toList();
+  return getEvents.map<Event>((json) => Event.fromJson(json)).toList();
 }
 
 Future<void> signOutCurrentUser() async {
@@ -282,5 +296,34 @@ Future<void> signOutCurrentUser() async {
     safePrint('Sign out completed successfully');
   } else if (result is CognitoFailedSignOut) {
     safePrint('Error signing user out: ${result.exception.message}');
+  }
+}
+
+Map<String, dynamic> handleGraphQLResponse(Response response) {
+  Map<String, dynamic> responseData = jsonDecode(response.body);
+  if (response.statusCode == 200) {
+    // Successful response, parse JSON
+    // Check if there are any errors
+    if (responseData.containsKey('errors')) {
+      List<dynamic> errors = responseData['errors'];
+      // Extract error messages
+      List errorMessages = errors.map((error) => error['message']).toList();
+
+      // Print or handle error messages
+      if (errorMessages.isNotEmpty) {
+        throw Exception("Error: $errorMessages");
+      }
+      return responseData;
+    } else {
+      // No errors, process data
+      print('GraphQL Data: ${responseData['data']}');
+      return responseData['data'];
+    }
+  } else {
+    // Handle non-200 status code
+    print('HTTP Error: ${response.statusCode}');
+    print('HTTP Error: ${responseData['errors'][0]['errorType']}');
+    print('HTTP Error: ${responseData['errors'][0]['message']}');
+    return responseData;
   }
 }

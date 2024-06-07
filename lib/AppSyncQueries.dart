@@ -1,15 +1,15 @@
 class AppSyncQueries {
-  static const String createEvent =
-      '''
+  static const String createEvent = '''
     mutation CreateEvent (\$input: EventInput!) {
       createEvent(input: \$input) {
+        userId
         title
+        date
       }
     }
   ''';
 
-  static const String listEvents =
-      '''
+  static const String listEvents = '''
     query GetEvents {
       getEvents {
         userId
@@ -19,8 +19,7 @@ class AppSyncQueries {
     }
   ''';
 
-  static const String deleteEvent =
-      '''
+  static const String deleteEvent = '''
       mutation DeleteEvent (\$input: DeleteEventInput!) {
         deleteEvent(input: \$input) {
           title
