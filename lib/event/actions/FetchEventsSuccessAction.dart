@@ -1,4 +1,4 @@
-import 'Event.dart';
+import '../model/Event.dart';
 
 class FetchEventsSuccessAction {
   final List<Event> events; // Define '_events' property

@@ -1,4 +1,4 @@
-import 'package:bizzy/event/Event.dart';
+import 'package:bizzy/event/model/Event.dart';
 
 class AppState {
   final List<Event> events;

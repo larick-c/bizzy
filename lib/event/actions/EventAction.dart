@@ -1,5 +1,5 @@
 import 'EventActionType.dart';
-import 'Event.dart';
+import '../model/Event.dart';
 
 class EventAction {
   final EventActionType type;

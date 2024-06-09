@@ -5,7 +5,7 @@ import 'dart:collection';
 
 import 'package:table_calendar/table_calendar.dart';
 
-import '../event/Event.dart';
+import '../event/model/Event.dart';
 
 /// Example events.
 ///

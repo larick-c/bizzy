@@ -3,12 +3,13 @@
 
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:bizzy/AppState.dart';
-import 'package:bizzy/event/EventViewModel.dart';
+import 'package:bizzy/event/model/EventViewModel.dart';
+import 'package:bizzy/event/actions/FetchEventsByDateRangeAction.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-import '../event/Event.dart';
+import '../event/model/Event.dart';
 import 'utils.dart';
 
 class TableEventsExample extends StatefulWidget {
@@ -32,7 +33,21 @@ class _TableEventsExampleState extends State<TableEventsExample> {
   void initState() {
     super.initState();
     _selectedDay = _focusedDay;
-    _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay!));
+
+    try {
+      // Access the Redux store in initState
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final store = StoreProvider.of<AppState>(context);
+        store.dispatch(FetchEventsByDateRangeAction(
+            startDate: _focusedDay.subtract(const Duration(days: 30)),
+            endDate: _focusedDay.add(const Duration(days: 30))));
+        // Perform any actions or initial state setup
+        // print("Initial counter value: ${store.events?.length}");
+      });
+    } catch (error) {
+      print('ERROR: ${error.toString()}');
+    }
+    // _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay!));
   }
 
   @override
@@ -45,6 +60,33 @@ class _TableEventsExampleState extends State<TableEventsExample> {
     // Implementation example
     return kEvents[day] ?? [];
   }
+
+  Event? _selectEventsForDay(
+      EventViewModel viewModel, DateTime? day, int index) {
+    List<Event> events = [];
+    for (var event in viewModel.events) {
+      if (event.date?.year == day?.year &&
+          event.date?.month == day?.month &&
+          event.date?.day == day?.day) {
+        events.add(event);
+      }
+    }
+    return events.isNotEmpty ? events[index] : null;
+  }
+
+  int? _selectEventCountForDay(EventViewModel viewModel, DateTime? day) {
+    int count = 0;
+    for (var event in viewModel.events) {
+      if (event.date?.year == day?.year &&
+          event.date?.month == day?.month &&
+          event.date?.day == day?.day) {
+        count++;
+      }
+    }
+    return count;
+  }
+
+  // List<Event> _selectEventsForRange(DateTime start, DateTime end) {}
 
   List<Event> _getEventsForRange(DateTime start, DateTime end) {
     // Implementation example
@@ -66,7 +108,7 @@ class _TableEventsExampleState extends State<TableEventsExample> {
         _rangeSelectionMode = RangeSelectionMode.toggledOff;
       });
 
-      _selectedEvents.value = _getEventsForDay(selectedDay);
+      // _selectedEvents.value = _getEventsForDay(selectedDay);
     }
   }
 
@@ -200,10 +242,12 @@ class _TableEventsExampleState extends State<TableEventsExample> {
               converter: (store) => EventViewModel.fromStore(store),
               builder: (context, eventViewModel) {
                 return ListView.builder(
-                  itemCount: eventViewModel.events.length,
+                  itemCount:
+                      _selectEventCountForDay(eventViewModel, _selectedDay),
                   itemBuilder: (context, index) {
                     return DismissableWidget(
-                        event: eventViewModel.events[index]);
+                        event: _selectEventsForDay(
+                            eventViewModel, _selectedDay, index));
                   },
                 );
               },
@@ -233,7 +277,7 @@ class _TableEventsExampleState extends State<TableEventsExample> {
                           Event event = Event(
                               userId: user.userId,
                               title: _controller.text,
-                              date: DateTime.now());
+                              date: _selectedDay);
                           eventViewModel.createEvent(event);
                           _controller.clear();
                           DateTime normalizedDate = DateTime(_selectedDay!.year,

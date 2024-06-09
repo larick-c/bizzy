@@ -1,5 +1,5 @@
-import 'package:bizzy/event/EventActionType.dart';
-import 'Event.dart';
+import 'package:bizzy/event/actions/EventActionType.dart';
+import '../model/Event.dart';
 
 class DeleteEventAction {
   final EventActionType type;

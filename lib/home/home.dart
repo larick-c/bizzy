@@ -4,12 +4,13 @@ import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:bizzy/AppSyncQueries.dart';
 import 'package:bizzy/AppState.dart';
-import 'package:bizzy/event/CreateEventSuccessAction.dart';
-import 'package:bizzy/event/EventAction.dart';
-import 'package:bizzy/event/EventActionType.dart';
-import 'package:bizzy/event/Event.dart';
-import 'package:bizzy/event/FetchEventsAction.dart';
+import 'package:bizzy/event/actions/CreateEventSuccessAction.dart';
+import 'package:bizzy/event/actions/EventAction.dart';
+import 'package:bizzy/event/actions/EventActionType.dart';
+import 'package:bizzy/event/model/Event.dart';
+import 'package:bizzy/event/actions/FetchEventsAction.dart';
 import 'package:bizzy/calendar/calendar_feed.dart';
+import 'package:bizzy/event/actions/FetchEventsByDateRangeAction.dart';
 import 'package:bizzy/finance/finance_feed.dart';
 import 'package:bizzy/fitness/fitness_feed.dart';
 import 'package:bizzy/home/home_page.dart';
@@ -24,9 +25,9 @@ import 'package:http/src/response.dart';
 import 'package:logger/logger.dart';
 import 'package:redux/redux.dart';
 import 'package:bizzy/BGraph.dart';
-import 'package:bizzy/event/FetchEventsSuccessAction.dart';
+import 'package:bizzy/event/actions/FetchEventsSuccessAction.dart';
 
-import '../event/DeleteEventAction.dart';
+import '../event/actions/DeleteEventAction.dart';
 
 class Home extends StatelessWidget {
   Home({super.key});
@@ -225,6 +226,19 @@ Future<Response> listEvents(dynamic action) async {
   return data;
 }
 
+Future<Response> fetchEventsByDateRange(dynamic action) async {
+  Map<String, dynamic> eventDateRangeInput = {
+    "input": {
+      "userId": action.event.userId,
+      "startDate": action.event.startDate,
+      "endDate": action.event.endDate
+    }
+  };
+  final data = await BGraph.query(AppSyncQueries.getEventsByDateRange,
+      variables: eventDateRangeInput);
+  return data;
+}
+
 Future<Response> deleteEvent(dynamic action) async {
   Map<String, dynamic> deleteEventInput = {
     "input": {
@@ -248,6 +262,8 @@ void fetchMiddleware(Store<AppState> store, action, NextDispatcher next) {
     }).catchError((error) {
       print("LIST EVENTS MIDDLEWARE ACTION ERROR: $error");
     });
+  } else if (action is FetchEventsByDateRangeAction) {
+    print('FETCH EVENTS BY DATE RANGE');
   } else if (action is EventAction) {
     if (action.type == EventActionType.create) {
       createEvent(action).then((Response response) {

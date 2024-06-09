@@ -1,6 +1,6 @@
 import 'package:bizzy/calendar/BizzyCalendar.dart';
 import 'package:bizzy/calendar/TableEvents.dart';
-import 'package:bizzy/event/EventViewModel.dart';
+import 'package:bizzy/event/model/EventViewModel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:logger/logger.dart';
