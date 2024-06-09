@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:bizzy/AppState.dart';
 import 'package:bizzy/event/actions/CreateEventSuccessAction.dart';
-import 'package:bizzy/event/actions/EventActionType.dart';
+import 'package:bizzy/event/actions/FetchEventsByDateRangeSuccessAction.dart';
 import 'package:bizzy/event/model/Event.dart';
 import 'package:bizzy/event/queries/api.dart';
 import 'package:http/http.dart';
@@ -31,17 +31,32 @@ Future<void> handleDeleteAction(Store<AppState> store, dynamic action) async {
   });
 }
 
-List<Event> parseEvents(String jsonString) {
+Future<void> handleFetchEventsByDateRangeAction(
+    Store<AppState> store, dynamic action) async {
+  fetchEventsByDateRange(action).then((Response response) {
+    handleGraphQLResponse(response);
+    List<Event> plusMinusOneMonthListOfEvents =
+        parseEvents(response.body, 'getEventsByDate');
+    store.dispatch(FetchEventsByDateRangeSuccessAction(
+        listOfEvents: plusMinusOneMonthListOfEvents));
+    print('got events by date range successfully');
+    print('found (${plusMinusOneMonthListOfEvents.length}) events');
+  }).catchError((onError) {
+    print('Error fetching events by date range: $onError');
+  });
+}
+
+List<Event> parseEvents(String jsonString, method) {
   final decoded = json.decode(jsonString);
   final data = decoded['data'] as Map<String, dynamic>?;
   if (data == null) {
     throw Exception('Data is null');
   }
-  final getEvents = data['getEvents'] as List<dynamic>?;
+  final getEvents = data[method] as List<dynamic>?;
   if (getEvents == null) {
     throw Exception('getEvents is null');
   }
-  return getEvents.map<Event>((json) => Event.fromJson(json)).toList();
+  return getEvents.map<Event>((json) => Event.fromMap(json)).toList();
 }
 
 Map<String, dynamic> handleGraphQLResponse(Response response) {

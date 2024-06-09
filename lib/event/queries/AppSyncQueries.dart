@@ -29,8 +29,8 @@ class AppSyncQueries {
     ''';
 
   static const String getEventsByDateRange = '''
-      query GetEventsByDate {
-        getEventsByDate(\$input: EventByDateInput) {
+      query GetEventsByDate (\$input: EventByDateInput!) {
+        getEventsByDate(input: \$input) {
             userId
             eventId
             title

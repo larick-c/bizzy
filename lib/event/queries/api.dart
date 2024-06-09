@@ -24,9 +24,9 @@ Future<Response> listEvents(dynamic action) async {
 Future<Response> fetchEventsByDateRange(dynamic action) async {
   Map<String, dynamic> eventDateRangeInput = {
     "input": {
-      "userId": action.event.userId,
-      "startDate": action.event.startDate,
-      "endDate": action.event.endDate
+      "userId": action.userId,
+      "startDate": action.startDate.toString(),
+      "endDate": action.endDate.toString()
     }
   };
   final data = await BGraph.query(AppSyncQueries.getEventsByDateRange,

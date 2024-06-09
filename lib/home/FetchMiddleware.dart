@@ -12,7 +12,7 @@ void fetchMiddleware(Store<AppState> store, action, NextDispatcher next) {
   if (action is FetchEventsAction) {
     print("FetchEventsAction");
   } else if (action is FetchEventsByDateRangeAction) {
-    print('FETCH EVENTS BY DATE RANGE');
+    handleFetchEventsByDateRangeAction(store, action);
   } else if (action is EventAction) {
     if (action.type == EventActionType.create) {
       handleCreateAction(store, action);

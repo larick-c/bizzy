@@ -1,6 +1,5 @@
-import 'package:bizzy/AppState.dart';
 import 'package:bizzy/event/actions/CreateEventSuccessAction.dart';
-import 'package:bizzy/event/actions/FetchEventsSuccessAction.dart';
+import 'package:bizzy/event/actions/FetchEventsByDateRangeSuccessAction.dart';
 import 'package:bizzy/event/state/EventState.dart';
 
 EventState eventReducer(EventState state, dynamic action) {
@@ -9,6 +8,8 @@ EventState eventReducer(EventState state, dynamic action) {
       return state.copyWith(
         events: [...state.events, action.event],
       );
+    case FetchEventsByDateRangeSuccessAction:
+      return state.copyWith(events: [...state.events, ...action.listOfEvents]);
     default:
       return state;
   }

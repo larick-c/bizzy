@@ -10,7 +10,7 @@ class Event {
         userId: json['userId'] as String,
         title: json['title'] as String,
         eventId: json['eventId'] as String,
-        date: json['date' as DateTime]);
+        date: DateTime.parse(json['date' as DateTime]));
   }
 
   // Factory constructor to create Event from a map
