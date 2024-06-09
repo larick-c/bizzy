@@ -20,7 +20,7 @@ class EventViewModel {
 
   static EventViewModel fromStore(Store<AppState> store) {
     return EventViewModel(
-      events: store.state.events,
+      events: store.state.eventState.events,
       createEvent: (event) =>
           store.dispatch(EventAction(EventActionType.create, event: event)),
       deleteEvent: (event) =>

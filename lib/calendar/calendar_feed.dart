@@ -1,4 +1,3 @@
-import 'package:bizzy/calendar/BizzyCalendar.dart';
 import 'package:bizzy/calendar/TableEvents.dart';
 import 'package:bizzy/event/model/EventViewModel.dart';
 import 'package:flutter/material.dart';

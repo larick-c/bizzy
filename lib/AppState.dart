@@ -1,20 +1,15 @@
-import 'package:bizzy/event/model/Event.dart';
+import 'package:bizzy/event/state/EventState.dart';
 
 class AppState {
-  final List<Event> events;
+  final EventState eventState;
 
-  AppState({required this.events});
+  AppState({required this.eventState});
 
   factory AppState.initialState() {
-    return AppState(events: []);
+    return AppState(eventState: EventState.initial());
   }
 
-  AppState copyWith({List<Event>? events}) {
-    return AppState(events: events ?? this.events);
-  }
-
-  @override
-  String toString() {
-    return 'EventState{events: $events}';
+  AppState copyWith({EventState? eventState}) {
+    return AppState(eventState: eventState ?? this.eventState);
   }
 }
