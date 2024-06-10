@@ -146,7 +146,7 @@ class _TableEventsExampleState extends State<TableEventsExample> {
 
     for (var event in events) {
       final eventDate =
-          DateTime(event.date.year, event.date.month, event.date.day);
+          DateTime(event.date!.year, event.date!.month, event.date!.day);
       if (groupedEvents[eventDate] == null) {
         groupedEvents[eventDate] = [];
       }
@@ -158,10 +158,10 @@ class _TableEventsExampleState extends State<TableEventsExample> {
 
   @override
   Widget build(BuildContext context) {
-    return StoreConnector<AppState, EventState>(
-        converter: (store) => store.state.eventState,
-        builder: (context, eventState) {
-          final eventsByDate = groupEventsByDate(eventState.events);
+    return StoreConnector<AppState, EventViewModel>(
+        converter: (store) => EventViewModel.fromStore(store),
+        builder: (context, eventViewModel) {
+          final eventsByDate = groupEventsByDate(eventViewModel.events);
           return Scaffold(
             body: Column(
               children: [
@@ -174,7 +174,11 @@ class _TableEventsExampleState extends State<TableEventsExample> {
                   rangeEndDay: _rangeEnd,
                   calendarFormat: _calendarFormat,
                   rangeSelectionMode: _rangeSelectionMode,
-                  eventLoader: _getEventsForDay,
+                  eventLoader: (day) {
+                    DateTime normalizedDate =
+                        DateTime(day.year, day.month, day.day);
+                    return eventsByDate[normalizedDate] ?? [];
+                  },
                   startingDayOfWeek: StartingDayOfWeek.monday,
                   calendarStyle: const CalendarStyle(
                     // Use `CalendarStyle` to customize the UI
