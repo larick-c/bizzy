@@ -17,7 +17,6 @@ Future<Response> createEvent(dynamic action) async {
 
 Future<Response> listEvents(dynamic action) async {
   final data = await BGraph.listEvents(AppSyncQueries.listEvents);
-  print("DATA: ${data.body}");
   return data;
 }
 
@@ -44,6 +43,5 @@ Future<Response> deleteEvent(dynamic action) async {
   };
   final data = await BGraph.query(AppSyncQueries.deleteEvent,
       variables: deleteEventInput);
-  print("DATA: ${data.body}");
   return data;
 }

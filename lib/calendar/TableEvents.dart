@@ -3,9 +3,10 @@
 
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:bizzy/AppState.dart';
+import 'package:bizzy/event/actions/DeleteEventAction.dart';
+import 'package:bizzy/event/actions/EventActionType.dart';
 import 'package:bizzy/event/model/EventViewModel.dart';
 import 'package:bizzy/event/actions/FetchEventsByDateRangeAction.dart';
-import 'package:bizzy/event/state/EventState.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -70,22 +71,21 @@ class _TableEventsExampleState extends State<TableEventsExample> {
     // return eventsByDate[day] ?? [];
   }
 
-  Event? _selectEventsForDay(
-      EventViewModel viewModel, DateTime? day, int index) {
-    List<Event> events = [];
-    for (var event in viewModel.events) {
+  List<Event> _selectEventsForDay(List<Event> events, DateTime? day) {
+    List<Event> updatedEvents = [];
+    for (var event in events) {
       if (event.date?.year == day?.year &&
           event.date?.month == day?.month &&
           event.date?.day == day?.day) {
-        events.add(event);
+        updatedEvents.add(event);
       }
     }
-    return events.isNotEmpty ? events[index] : null;
+    return updatedEvents.isNotEmpty ? updatedEvents : [];
   }
 
-  int? _selectEventCountForDay(EventViewModel viewModel, DateTime? day) {
+  int? _selectEventCountForDay(List<Event> events, DateTime? day) {
     int count = 0;
-    for (var event in viewModel.events) {
+    for (var event in events) {
       if (event.date?.year == day?.year &&
           event.date?.month == day?.month &&
           event.date?.day == day?.day) {
@@ -272,16 +272,15 @@ class _TableEventsExampleState extends State<TableEventsExample> {
                 ),
                 // const SizedBox(height: 8.0),
                 Expanded(
-                  child: StoreConnector<AppState, EventViewModel>(
-                    converter: (store) => EventViewModel.fromStore(store),
-                    builder: (context, eventViewModel) {
+                  child: StoreConnector<AppState, List<Event>>(
+                    converter: (store) => _selectEventsForDay(
+                        store.state.eventState.events, _selectedDay),
+                    builder: (context, events) {
                       return ListView.builder(
-                        itemCount: _selectEventCountForDay(
-                            eventViewModel, _selectedDay),
+                        itemCount:
+                            _selectEventCountForDay(events, _selectedDay),
                         itemBuilder: (context, index) {
-                          return DismissableWidget(
-                              event: _selectEventsForDay(
-                                  eventViewModel, _selectedDay, index));
+                          return DismissibleExample(event: events[index]);
                         },
                       );
                     },
@@ -335,43 +334,31 @@ class _TableEventsExampleState extends State<TableEventsExample> {
   }
 }
 
-class DismissableWidget extends StatefulWidget {
-  final dynamic event;
-
-  DismissableWidget({required this.event});
-
+class DismissibleExample extends StatefulWidget {
+  const DismissibleExample({super.key, required this.event});
+  final Event event;
   @override
-  _DismissableWidgetState createState() => _DismissableWidgetState();
+  _DismissibleExampleState createState() => _DismissibleExampleState();
 }
 
-class _DismissableWidgetState extends State<DismissableWidget> {
-  final GlobalKey<_DismissableWidgetState> dismissableKey = GlobalKey();
-  bool _isDismissed = false;
+class _DismissibleExampleState extends State<DismissibleExample> {
   @override
   Widget build(BuildContext context) {
-    return StoreConnector<AppState, EventViewModel>(
-        converter: (store) => EventViewModel.fromStore(store),
-        builder: (context, eventViewModel) {
-          return _isDismissed
-              ? SizedBox()
-              : Dismissible(
-                  key: dismissableKey, // Provide a unique key for each item
-                  background: Container(
-                      color: Colors.red), // Background color when swiping
-                  direction: DismissDirection
-                      .endToStart, // Swipe from right to left to delete
-                  onDismissed: (direction) {
-                    setState(() {
-                      _isDismissed = true;
-                    });
-                    eventViewModel.deleteEvent(widget.event);
-                  },
-                  child: ListTile(
-                    title: Text(widget.event.title),
-                    trailing: const Icon(Icons.delete), // Delete icon
-                  ),
-                );
-        });
+    return Dismissible(
+      background: Container(
+        color: Colors.green,
+      ),
+      key: ValueKey<String?>(widget.event.eventId),
+      onDismissed: (DismissDirection direction) {
+        StoreProvider.of<AppState>(context)
+            .dispatch(DeleteEventAction(EventActionType.delete, widget.event));
+      },
+      child: ListTile(
+        title: Text(
+          widget.event.title,
+        ),
+      ),
+    );
   }
 }
 

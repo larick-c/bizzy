@@ -2,7 +2,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert'; // For json encoding/decoding
 
 class BGraph {
-  static const apiKey = 'da2-c6vfaznehzhyzkcpi2koz6zrsu';
+  static const apiKey = 'da2-4o7xnr5o3je3xiot4c4dph7r7y';
   static const String url =
       'https://3wf2higdwbcjdksgw4a7434jda.appsync-api.us-east-2.amazonaws.com/graphql';
   static Future<http.Response> listEvents(String query,

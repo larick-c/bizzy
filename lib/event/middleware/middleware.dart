@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:bizzy/AppState.dart';
 import 'package:bizzy/event/actions/CreateEventSuccessAction.dart';
+import 'package:bizzy/event/actions/DeleteEventSuccessAction.dart';
+import 'package:bizzy/event/actions/EventActionType.dart';
 import 'package:bizzy/event/actions/FetchEventsByDateRangeSuccessAction.dart';
 import 'package:bizzy/event/model/Event.dart';
 import 'package:bizzy/event/queries/api.dart';
@@ -25,7 +27,8 @@ Future<void> handleCreateAction(Store<AppState> store, dynamic action) async {
 
 Future<void> handleDeleteAction(Store<AppState> store, dynamic action) async {
   deleteEvent(action).then((Response response) {
-    print('Deleted event successfully');
+    Event event = graphQLResponseHandler(store, response, 'deleteEvent');
+    store.dispatch(DeleteEventSuccessAction(EventActionType.delete, event));
   }).catchError((error) {
     print('Error deleting event: $error');
   });
@@ -44,6 +47,18 @@ Future<void> handleFetchEventsByDateRangeAction(
   }).catchError((onError) {
     print('Error fetching events by date range: $onError');
   });
+}
+
+Event graphQLResponseHandler(
+    Store<AppState> store, Response response, String method) {
+  Map<String, dynamic> responseHandler = handleGraphQLResponse(response);
+  if (responseHandler['errors'] != null &&
+      responseHandler['errors'].length > 0) {
+    throw Exception(
+        'ERROR in graphQLResponseHandler: ${responseHandler['errors']}');
+  } else {
+    return Event.fromMap(responseHandler[method]);
+  }
 }
 
 List<Event> parseEvents(String jsonString, method) {
