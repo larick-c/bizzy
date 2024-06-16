@@ -346,7 +346,7 @@ class _DismissibleExampleState extends State<DismissibleExample> {
   Widget build(BuildContext context) {
     return Dismissible(
       background: Container(
-        color: Colors.green,
+        color: Colors.red,
       ),
       key: ValueKey<String?>(widget.event.eventId),
       onDismissed: (DismissDirection direction) {
@@ -354,8 +354,14 @@ class _DismissibleExampleState extends State<DismissibleExample> {
             .dispatch(DeleteEventAction(EventActionType.delete, widget.event));
       },
       child: ListTile(
-        title: Text(
-          widget.event.title,
+        title: Text(widget.event.title,
+            style: const TextStyle(
+                fontSize: 20, fontWeight: FontWeight.w500, letterSpacing: 3)),
+        subtitle: Text('${widget.event.date}'),
+        leading: const Icon(Icons.event, color: Colors.black),
+        trailing: const Icon(
+          Icons.remove,
+          color: Colors.black,
         ),
       ),
     );
