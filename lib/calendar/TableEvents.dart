@@ -163,172 +163,159 @@ class _TableEventsExampleState extends State<TableEventsExample> {
         builder: (context, eventViewModel) {
           final eventsByDate = groupEventsByDate(eventViewModel.events);
           return Scaffold(
-            body: Column(
-              children: [
-                TableCalendar<Event>(
-                  firstDay: kFirstDay,
-                  lastDay: kLastDay,
-                  focusedDay: _focusedDay,
-                  selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-                  rangeStartDay: _rangeStart,
-                  rangeEndDay: _rangeEnd,
-                  calendarFormat: _calendarFormat,
-                  rangeSelectionMode: _rangeSelectionMode,
-                  eventLoader: (day) {
-                    DateTime normalizedDate =
-                        DateTime(day.year, day.month, day.day);
-                    return eventsByDate[normalizedDate] ?? [];
-                  },
-                  startingDayOfWeek: StartingDayOfWeek.monday,
-                  calendarStyle: const CalendarStyle(
-                    // Use `CalendarStyle` to customize the UI
-                    outsideDaysVisible: false,
-                  ),
-                  onDaySelected: _onDaySelected,
-                  onRangeSelected: _onRangeSelected,
-                  onFormatChanged: (format) {
-                    if (_calendarFormat != format) {
-                      setState(() {
-                        _calendarFormat = format;
-                      });
+            body: Column(children: [
+              TableCalendar<Event>(
+                firstDay: kFirstDay,
+                lastDay: kLastDay,
+                focusedDay: _focusedDay,
+                selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+                rangeStartDay: _rangeStart,
+                rangeEndDay: _rangeEnd,
+                calendarFormat: _calendarFormat,
+                rangeSelectionMode: _rangeSelectionMode,
+                eventLoader: (day) {
+                  DateTime normalizedDate =
+                      DateTime(day.year, day.month, day.day);
+                  return eventsByDate[normalizedDate] ?? [];
+                },
+                startingDayOfWeek: StartingDayOfWeek.monday,
+                calendarStyle: const CalendarStyle(
+                  // Use `CalendarStyle` to customize the UI
+                  outsideDaysVisible: false,
+                ),
+                onDaySelected: _onDaySelected,
+                onRangeSelected: _onRangeSelected,
+                onFormatChanged: (format) {
+                  if (_calendarFormat != format) {
+                    setState(() {
+                      _calendarFormat = format;
+                    });
+                  }
+                },
+                onPageChanged: (focusedDay) {
+                  _focusedDay = focusedDay;
+                },
+                calendarBuilders: CalendarBuilders(
+                  markerBuilder: (context, date, events) {
+                    if (events.isNotEmpty) {
+                      return Positioned(
+                        right: 1,
+                        bottom: 1,
+                        child: Container(
+                          padding: EdgeInsets.all(4.0),
+                          decoration: BoxDecoration(
+                            color: Colors.black, // Customize this color
+                            shape: BoxShape.rectangle,
+                            borderRadius: BorderRadius.circular(
+                                8.0), // Adjust for rounded corners
+                          ),
+                          child: Text(
+                            '${events.length}',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12.0, // Customize text size
+                            ),
+                          ),
+                        ),
+                      );
                     }
+                    return null;
                   },
-                  onPageChanged: (focusedDay) {
-                    _focusedDay = focusedDay;
+                  selectedBuilder: (context, date, events) {
+                    return Container(
+                      margin: const EdgeInsets.all(4.0),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        image: const DecorationImage(
+                          image: AssetImage('assets/icon/1-02.png'),
+                          fit: BoxFit.cover,
+                        ),
+                        shape: BoxShape.rectangle,
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      child: Text(
+                        '${date.day}',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    );
                   },
-                  calendarBuilders: CalendarBuilders(
-                    markerBuilder: (context, date, events) {
-                      if (events.isNotEmpty) {
-                        return Positioned(
-                          right: 1,
-                          bottom: 1,
-                          child: Container(
-                            padding: EdgeInsets.all(4.0),
-                            decoration: BoxDecoration(
-                              color: Colors.black, // Customize this color
-                              shape: BoxShape.rectangle,
-                              borderRadius: BorderRadius.circular(
-                                  8.0), // Adjust for rounded corners
-                            ),
-                            child: Text(
-                              '${events.length}',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 12.0, // Customize text size
-                              ),
-                            ),
-                          ),
-                        );
-                      }
-                      return null;
-                    },
-                    selectedBuilder: (context, date, events) {
-                      return Container(
-                        margin: const EdgeInsets.all(4.0),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          image: const DecorationImage(
-                            image: AssetImage('assets/icon/1-02.png'),
-                            fit: BoxFit.cover,
-                          ),
-                          shape: BoxShape.rectangle,
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        child: Text(
-                          '${date.day}',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      );
-                    },
-                    todayBuilder: (context, date, events) {
-                      return Container(
-                        margin: const EdgeInsets.all(4.0),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: AssetImage('assets/icon/1-02.png'),
-                            fit: BoxFit.cover,
-                            colorFilter: ColorFilter.mode(
-                              Colors.black.withOpacity(
-                                  0.5), // Adjust opacity here (0.0 - 1.0).
-                              BlendMode
-                                  .dstATop, // This blend mode applies the color as an overlay to the image.
-                            ),
-                          ),
-                          // color: Colors.orange, // Custom color for the focused day
-                          shape: BoxShape
-                              .rectangle, // Change to BoxShape.circle for circle
-                          borderRadius: BorderRadius.circular(
-                              8.0), // Adjust for rounded corners
-                        ),
-                        child: Text(
-                          date.day.toString(),
-                          style: TextStyle(
-                              color: Colors.white), // Custom text style
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                // const SizedBox(height: 8.0),
-                Expanded(
-                  child: StoreConnector<AppState, List<Event>>(
-                    converter: (store) => _selectEventsForDay(
-                        store.state.eventState.events, _selectedDay),
-                    builder: (context, events) {
-                      return ListView.builder(
-                        itemCount:
-                            _selectEventCountForDay(events, _selectedDay),
-                        itemBuilder: (context, index) {
-                          return DismissibleExample(event: events[index]);
-                        },
-                      );
-                    },
-                  ),
-                ),
-
-                StoreConnector<AppState, EventViewModel>(
-                  converter: (store) => EventViewModel.fromStore(store),
-                  builder: (context, eventViewModel) {
-                    return Row(
-                      mainAxisSize: MainAxisSize.min,
-                      // mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: _controller,
-                            decoration: const InputDecoration(
-                              labelText: 'Enter Event Title',
-                            ),
+                  todayBuilder: (context, date, events) {
+                    return Container(
+                      margin: const EdgeInsets.all(4.0),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: AssetImage('assets/icon/1-02.png'),
+                          fit: BoxFit.cover,
+                          colorFilter: ColorFilter.mode(
+                            Colors.black.withOpacity(
+                                0.5), // Adjust opacity here (0.0 - 1.0).
+                            BlendMode
+                                .dstATop, // This blend mode applies the color as an overlay to the image.
                           ),
                         ),
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: () async {
-                              if (_controller.text != "") {
-                                Event event = Event(
-                                    userId: user.userId,
-                                    title: _controller.text,
-                                    date: _selectedDay);
-                                eventViewModel.createEvent(event);
-                                _controller.clear();
-                              }
-                            },
-                            child: const Text('Create Event'),
-                          ),
-                        ),
-                        // Expanded(
-                        //   child: ElevatedButton(
-                        //     onPressed: () => {},
-                        //     child: const Text('Fetch Events'),
-                        //   ),
-                        // ),
-                      ],
+                        // color: Colors.orange, // Custom color for the focused day
+                        shape: BoxShape
+                            .rectangle, // Change to BoxShape.circle for circle
+                        borderRadius: BorderRadius.circular(
+                            8.0), // Adjust for rounded corners
+                      ),
+                      child: Text(
+                        date.day.toString(),
+                        style:
+                            TextStyle(color: Colors.white), // Custom text style
+                      ),
                     );
                   },
                 ),
-              ],
-            ),
+              ),
+              // const SizedBox(height: 8.0),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: _selectEventCountForDay(
+                      eventViewModel.events, _selectedDay),
+                  itemBuilder: (context, index) {
+                    return DismissibleExample(
+                        event: eventViewModel.events[index]);
+                  },
+                ),
+              ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                // mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _controller,
+                      decoration: const InputDecoration(
+                        labelText: 'Enter Event Title',
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        if (_controller.text != "") {
+                          Event event = Event(
+                              userId: user.userId,
+                              title: _controller.text,
+                              date: _selectedDay);
+                          eventViewModel.createEvent(event);
+                          _controller.clear();
+                        }
+                      },
+                      child: const Text('Create Event'),
+                    ),
+                  ),
+                  // Expanded(
+                  //   child: ElevatedButton(
+                  //     onPressed: () => {},
+                  //     child: const Text('Fetch Events'),
+                  //   ),
+                  // ),
+                ],
+              ),
+            ]),
           );
         });
   }
