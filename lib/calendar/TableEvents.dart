@@ -1,6 +1,8 @@
 // Copyright 2019 Aleksander Woźniak
 // SPDX-License-Identifier: Apache-2.0
 
+import 'dart:math';
+
 import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:bizzy/AppState.dart';
 import 'package:bizzy/event/actions/DeleteEventAction.dart';
@@ -270,51 +272,56 @@ class _TableEventsExampleState extends State<TableEventsExample> {
                 ),
               ),
               // const SizedBox(height: 8.0),
+              // Expanded(
+              //   child: ListView.builder(
+              //     itemCount: _selectEventCountForDay(
+              //         eventViewModel.events, _selectedDay),
+              //     itemBuilder: (context, index) {
+              //       return DismissibleExample(
+              //           event: eventViewModel.events[index]);
+              //     },
+              //   ),
+              // ),
               Expanded(
-                child: ListView.builder(
-                  itemCount: _selectEventCountForDay(
-                      eventViewModel.events, _selectedDay),
-                  itemBuilder: (context, index) {
-                    return DismissibleExample(
-                        event: eventViewModel.events[index]);
-                  },
-                ),
+                child: ListViewWithSlideUpWidget(
+                    events: _selectEventsForDay(
+                        eventViewModel.events, _selectedDay)),
               ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                // mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _controller,
-                      decoration: const InputDecoration(
-                        labelText: 'Enter Event Title',
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        if (_controller.text != "") {
-                          Event event = Event(
-                              userId: user.userId,
-                              title: _controller.text,
-                              date: _selectedDay);
-                          eventViewModel.createEvent(event);
-                          _controller.clear();
-                        }
-                      },
-                      child: const Text('Create Event'),
-                    ),
-                  ),
-                  // Expanded(
-                  //   child: ElevatedButton(
-                  //     onPressed: () => {},
-                  //     child: const Text('Fetch Events'),
-                  //   ),
-                  // ),
-                ],
-              ),
+              // Row(
+              //   mainAxisSize: MainAxisSize.min,
+              //   // mainAxisAlignment: MainAxisAlignment.center,
+              //   children: [
+              //     Expanded(
+              //       child: TextField(
+              //         controller: _controller,
+              //         decoration: const InputDecoration(
+              //           labelText: 'Enter Event Title',
+              //         ),
+              //       ),
+              //     ),
+              //     Expanded(
+              //       child: ElevatedButton(
+              //         onPressed: () async {
+              //           if (_controller.text != "") {
+              //             Event event = Event(
+              //                 userId: user.userId,
+              //                 title: _controller.text,
+              //                 date: _selectedDay);
+              //             eventViewModel.createEvent(event);
+              //             _controller.clear();
+              //           }
+              //         },
+              //         child: const Text('Create Event'),
+              //       ),
+              //     ),
+              //     // Expanded(
+              //     //   child: ElevatedButton(
+              //     //     onPressed: () => {},
+              //     //     child: const Text('Fetch Events'),
+              //     //   ),
+              //     // ),
+              // ],
+              // ),
             ]),
           );
         });
@@ -361,5 +368,190 @@ Future<AuthUser?> getCurrentUser() async {
   } catch (e) {
     print('Error getting current user: $e');
     return null;
+  }
+}
+
+class ListViewWithSlideUpWidget extends StatefulWidget {
+  final List<Event> events;
+
+  ListViewWithSlideUpWidget({required this.events});
+
+  @override
+  _ListViewWithSlideUpWidgetState createState() =>
+      _ListViewWithSlideUpWidgetState();
+}
+
+class _ListViewWithSlideUpWidgetState extends State<ListViewWithSlideUpWidget> {
+  bool _isWidgetVisible = false;
+  double _widgetHeight = 300.0; // Initial height of the sliding widget
+
+  String _titleValue = '';
+  DateTime? _selectedDate;
+  String id = '';
+  late TextEditingController _titleController;
+
+  @override
+  void initState() {
+    super.initState();
+    _titleController = TextEditingController();
+  }
+
+  void _showSlideUpWidget(int index) {
+    setState(() {
+      _isWidgetVisible = true;
+      id = widget.events[index].eventId!;
+      // Populate the text field with the current event title
+      _titleValue = widget.events[index].title;
+      _selectedDate = widget.events[index].date;
+      _titleController.text = _titleValue;
+    });
+  }
+
+  void _hideSlideUpWidget() {
+    setState(() {
+      _isWidgetVisible = false;
+      _widgetHeight = 300.0;
+      _titleValue = '';
+      _selectedDate = null;
+      id = '';
+    });
+  }
+
+  Event? _selectEventsForId(List<Event> events, String id) {
+    for (var event in events) {
+      if (event.eventId == id) {
+        return event;
+      }
+    }
+    return null;
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        _selectedDate = picked;
+        // Update the event date in the list
+        _selectEventsForId(widget.events, id)?.date = picked;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    List<Event> events = widget.events;
+    return Scaffold(
+      body: Stack(
+        children: <Widget>[
+          // ListView widget
+          ListView.builder(
+            itemCount: events.length,
+            itemBuilder: (context, index) {
+              return ListTile(
+                title: Text(events[index].title),
+                onTap: () {
+                  // Handle item tap
+                  _showSlideUpWidget(index);
+                },
+              );
+            },
+          ),
+          // Sliding widget
+          AnimatedPositioned(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            bottom: _isWidgetVisible ? 0 : -_widgetHeight,
+            left: 0,
+            right: 0,
+            child: GestureDetector(
+              onTap: () {
+                // Prevent tap propagation if necessary
+              },
+              child: Container(
+                height: _widgetHeight,
+                color: Colors.lightBlue,
+                child: Column(
+                  children: <Widget>[
+                    // Close button and event details
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: TextField(
+                                  controller: _titleController,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _titleValue = value;
+                                      // Update the event title in the list
+                                      _selectEventsForId(events, id)?.title =
+                                          value;
+                                    });
+                                  },
+                                  decoration: const InputDecoration(
+                                    labelText: 'Title',
+                                    border: OutlineInputBorder(),
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    _selectDate(context);
+                                  },
+                                  child: AbsorbPointer(
+                                    child: TextField(
+                                      controller: TextEditingController(
+                                        text: _selectedDate != null
+                                            ? _selectedDate!
+                                                .toLocal()
+                                                .toString()
+                                                .split(' ')[0]
+                                            : '',
+                                      ),
+                                      decoration: const InputDecoration(
+                                        labelText: 'Date',
+                                        border: OutlineInputBorder(),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close),
+                          onPressed: () {
+                            _hideSlideUpWidget();
+                          },
+                        ),
+                      ],
+                    ),
+                    // Optional additional content or actions in the sliding widget
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
